@@ -12,8 +12,9 @@ RBD_variants_dict = {
 "Delta"     :   [0, ["L452R", "T478K"]],
 "Kappa"     :   [0, ["L452R", "E484Q"]],
 "Lambda"    :   [0, ["L452Q", "F590S"]],
-"Omicron BA.1"   :   [2, ["1251T(K417N)", "1320G(N440K)", "1336A(G446S)", "1430A(S477N)", "1433A(T478K)", "1451C(E484A)", "1478G(Q493R)", "1486A(G496S)", "1493G(Q498R)", "1501T(N501Y)", "1513C(Y505H)", "1640A(T547K)"]],
-"Omicron BA.2"   :   [2, ["1251T(K417N)", "1320G(N440K)", ["not", "G446"], "1430A(S477N)", "1433A(T478K)", "1451C(E484A)", "1478G(Q493R)", ["not", "G496"], "1493G(Q498R)", "1501T(N501Y)", "1513C(Y505H)", ["not", "T547"]]],
+"Omicron BA.1"   :   [1, ["1251T(K417N)", "1320G(N440K)", "1336A(G446S)", ["not", "L452Q"], "1430A(S477N)", "1433A(T478K)", "1451C(E484A)", "1478G(Q493R)", "1486A(G496S)", "1493G(Q498R)", "1501T(N501Y)", "1513C(Y505H)", "1640A(T547K)"]],
+"Omicron BA.2"   :   [0, ["1251T(K417N)", "1320G(N440K)", ["not", "G446"],["not", "L452Q"],  "1430A(S477N)", "1433A(T478K)", "1451C(E484A)", "1478G(Q493R)", ["not", "G496"], "1493G(Q498R)", "1501T(N501Y)", "1513C(Y505H)", ["not", "T547"]]],
+"Omicron BA.2.12.1"   :   [0, ["1251T(K417N)", "1320G(N440K)", ["not", "G446"], "1355A(L452Q)", "1430A(S477N)", "1433A(T478K)", "1451C(E484A)", "1478G(Q493R)", ["not", "G496"], "1493G(Q498R)", "1501T(N501Y)", "1513C(Y505H)", ["not", "T547"]]],
 "L452R"     :   [0, ["L452R", ["not", "T478K"], ["not", "E484Q"], ["not", "Q498"]]],
 "Theta/Mu"     :   [0, ["E484K", "N501Y", ["not", "K417"]]],
 "E484K"     :   [0, ["E484K", ["not", "N501Y"], ["not", "K417"]]],
@@ -96,6 +97,7 @@ for file in os.listdir(os.getcwd()):
                                 "Lambda" : 0,
                                 "Omicron BA.1" : 0,
                                 "Omicron BA.2" : 0,
+                                "Omicron BA.2.12.1" : 0,
                                 "L452R" : 0,
                                 "Theta/Mu" : 0,
                                 "E484K" : 0,
@@ -195,6 +197,7 @@ for file in os.listdir(os.getcwd()):
                                 "Lambda" : 0,
                                 "Omicron BA.1" : 0,
                                 "Omicron BA.2" : 0,
+                                "Omicron BA.2.12.1" : 0,
                                 "L452R" : 0,
                                 "Theta" : 0,
                                 "E484K" : 0,
@@ -463,7 +466,7 @@ for file in os.listdir(os.getcwd()):
 outfile = open(date+"RBD_variant_counts.tsv", "w")
 outfile.write("Code\tWWTP\tBorough\tDate\tVirus Concentration (virus copies/L)\tNumber of Reads\tFlow rate (to be provided by DEP)\tiSeq/MiSeq\tSRA Accession\tAlpha N501Y+A570D")
 outfile.write("\tBeta K417N+E484K+N501Y\tGamma K417T+E484K+N501Y\tDelta L452R+T478K")
-outfile.write("\tKappa L452R+E484Q\tLambda L452R+F590S\tOmicron BA.1\tOmicron BA.2\tL452R (not T478K E484Q or Q498)\tTheta/Mu E484K N501Y (not K417)\tE484K (not K417 or N501Y)\tS477N (not K417 T478K or N501Y)")
+outfile.write("\tKappa L452R+E484Q\tLambda L452R+F590S\tOmicron BA.1\tOmicron BA.2\tOmicron BA.2.12.1\tL452R (not T478K E484Q or Q498)\tTheta/Mu E484K N501Y (not K417)\tE484K (not K417 or N501Y)\tS477N (not K417 T478K or N501Y)")
 outfile.write("\tWNY1 Family Q498Y H519 E484A\tWNY2 Family Q498Y H519N Q493K\tWNY3 Family K417T E484A Q498 K444T\tWNY4 Family Q498Y N501T F486V Y449R\tWNY5 Family K417T E484A Q498 N440E\tMixed\tOthers\tRBD comments\n")
 
 for wwtp in range(1, 15):

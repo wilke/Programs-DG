@@ -265,7 +265,7 @@ for file in os.listdir(os.getcwd()):
     if (file.lower()).endswith('_r1_001.fastq.gz'):
         # print(file)
         splitname = file.split('_')
-        
+
         domain = ''
         if 'RBD' in file.upper():
             if 'NTD' in file.upper() or 'S1S2' in file.upper():
@@ -275,96 +275,114 @@ for file in os.listdir(os.getcwd()):
         elif 'MIX' in file.upper():
             domain = 'Mixed'
         elif 'NTD' in file.upper():
-            domain = 'NTD'
+            if 'S1S2' in file.upper():
+                domain = 'Mixed'
+            else:
+                domain = 'NTD'
         elif 'S1S2' in file.upper():
             domain = 'S1S2'
         else:
-            print(f"no domain found for {file}")        
-        
+            print(f"no domain found for {file}")
+
         if 'RBD' in splitname[0]:
             site = splitname[0].split('RBD')[0].upper().strip('ABCDOC-')
             Date = splitname[0].split('RBD')[1].strip('NTD')
         else:
             site = splitname[0].upper().strip('ABCDOC-')
-            Date = splitname[1].upper().strip('RBDNTDALT')
+
+            if 'RBD' in splitname[1]:
+                Date = splitname[1].upper().split('RBD')[0].strip('ALT')
+            elif 'NTD' in splitname[1]:
+                Date = splitname[1].upper().split('NTD')[0]
+            elif 'S1S2' in splitname[1]:
+                Date = splitname[1].upper().split('S1S2')[0]
         try:
-            site = f"{int(site):03d}"
-        except Exception as e:
-            print(e)
-            print('site')
-            print(site)
-            print(file)
-        
-        Month = ''
-        try:
-            Month = f"{int(Date.split('-')[0]):02d}"
-        except Exception as e:
-            print(e)
-            print('month')
-            print(file)
-        Day = ''
-        try:
-            Day = f"{int(Date.split('-')[1]):02d}"
-        except Exception as e:
-            print(e)
-            print('day')
-            print(file)
-        # for c in Date.split('-')[1]:
-            # if c.isdigit():
-                # Day += c
-            # else:
-                # break
-        Year = 2022
-        if int(Month) > 11:
-            Year = 2021
-        
-        full_date = f"{Year}-{Month}-{Day}"
-        sample = f"{site}-{full_date}-{domain}"
-        
-        if sample in sampnames:
-            i = 2
-            print(f"Repeat name {sample}")
-            while (f"{sample}-{i}") in sampnames:
-                i += 1
-            sampname =f"{sample}-{i}"
-            
-        else:
-            sampname = sample
-        
-        sampnames.append(sampname)
-        newbiosampacc = ''
-        try:
-            newbiosampacc = biosamps_dict['Missouri-'+full_date]
-        except Exception as e:
-            print(e)
-            print('biosamp')
-            print(file)
-            print(full_date)
-            pass
-        out_file.write(f"{sampname}\t")
-        try:
-            ww_pop = ss_pop_dict[site]
+            Date
+            site
         except:
-            ww_pop = 'Not Collected'
-
-        # if "RBD" in file and "NTD" in file and "S1S2" in file:
-            # out_file.write("Mixed Spike N-Terminus Domain, Receptor Binding Domain and S1S2 Junction Domain amplicons")
-        if "RBD" in file and "NTD" in file:
-            out_file.write("Mixed Spike N-Terminus Domain and Receptor Binding Domain amplicons")
-        elif "RBD" in file:
-            out_file.write("Spike Receptor Binding Domain amplicon")
-        elif "NTD" in file:
-            out_file.write("Spike N-Terminus Domain amplicon")
+            print('date or site not captured')
+            print(file)
+        
         else:
-            out_file.write("Spike S1-S2 Junction Domain amplicon")
-        out_file.write(f"\tAmplicon\tViral RNA\tRT-PCR\tPaired\tIllumina\tIllumina MiSeq\tDomain Amplification\tfastq\t{file}\t" + "_".join(splitname[0:-2]) + "_R2_001.fastq.gz")
-        out_file.write(f"\t{newbiosampacc}")
-        out_file.write("\twastewater metagenome")
-        out_file.write(f"\t{full_date}\tUSA: Missouri\twastewater\t")
-        out_file.write(f"{ww_pop}\t24h\traw wastewater\tcomposite\tSARS-CoV-2\tYes\tMO DHSS\t")
+
+            try:
+                site = f"{int(site):03d}"
+            except Exception as e:
+                print(e)
+                print('site')
+                print(site)
+                print(file)
+
+            Month = ''
+            try:
+                Month = f"{int(Date.split('-')[0]):02d}"
+            except Exception as e:
+                print(e)
+                print('month')
+                print(file)
+            Day = ''
+            try:
+                Day = f"{int(Date.split('-')[1]):02d}"
+            except Exception as e:
+                print(e)
+                print('day')
+                print(file)
+            # for c in Date.split('-')[1]:
+                # if c.isdigit():
+                    # Day += c
+                # else:
+                    # break
+            Year = 2022
+            if int(Month) > 11:
+                Year = 2021
+
+            full_date = f"{Year}-{Month}-{Day}"
+            sample = f"{site}-{full_date}-{domain}"
+
+            if sample in sampnames:
+                i = 2
+                print(f"Repeat name {sample}")
+                while (f"{sample}-{i}") in sampnames:
+                    i += 1
+                sampname =f"{sample}-{i}"
+
+            else:
+                sampname = sample
+
+            sampnames.append(sampname)
+            newbiosampacc = ''
+            try:
+                newbiosampacc = biosamps_dict['Missouri-'+full_date]
+            except Exception as e:
+                print(e)
+                print('biosamp')
+                print(file)
+                print(full_date)
+                pass
+            out_file.write(f"{sampname}\t")
+            try:
+                ww_pop = ss_pop_dict[site]
+            except:
+                ww_pop = 'Not Collected'
+
+            # if "RBD" in file and "NTD" in file and "S1S2" in file:
+                # out_file.write("Mixed Spike N-Terminus Domain, Receptor Binding Domain and S1S2 Junction Domain amplicons")
+            if "RBD" in file and "NTD" in file:
+                out_file.write("Mixed Spike N-Terminus Domain and Receptor Binding Domain amplicons")
+            elif "RBD" in file:
+                out_file.write("Spike Receptor Binding Domain amplicon")
+            elif "NTD" in file:
+                out_file.write("Spike N-Terminus Domain amplicon")
+            else:
+                out_file.write("Spike S1-S2 Junction Domain amplicon")
+            out_file.write(f"\tAmplicon\tViral RNA\tRT-PCR\tPaired\tIllumina\tIllumina MiSeq\tDomain Amplification\tfastq\t{file}\t" + "_".join(splitname[0:-2]) + "_R2_001.fastq.gz")
+            out_file.write(f"\t{newbiosampacc}")
+            out_file.write("\twastewater metagenome")
+            out_file.write(f"\t{full_date}\tUSA: Missouri\twastewater\t")
+            out_file.write(f"{ww_pop}\t24h\traw wastewater\tcomposite\tSARS-CoV-2\tYes\tMO DHSS\t")
 
 
-        out_file.write("\n")
+            out_file.write("\n")
 
 
 

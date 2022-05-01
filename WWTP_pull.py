@@ -2,7 +2,8 @@
 
 import os
 import sys
-
+# BB, CI, OB, OH, TI, WI
+# 1, 11, 7, 13, 3, 4
 WWTP_dict = {   2 : [1, "BB", "Queens"],
                 4 : [2, "HP", "Bronx"],
                 13 : [3, "TI", "Queens"],
@@ -21,7 +22,8 @@ WWTP_dict = {   2 : [1, "BB", "Queens"],
                 '45' : [45, 'Lower Meramec', 'Lower Meramec'],
                 '033' : [33, 'CC', 'St. Louis'],
                 '045' : [45, 'Lower Meramec', 'Lower Meramec'],
-                'WI' : ['WI', 'WI', 'WI']
+                'WI' : ['WI', 'WI', 'WI'],
+                'CA' : ['Cali', 'Cali', 'Cali']
 }
 WWTP_dict2 = {   "BB" : 2,
                 "HP" : 4,
@@ -44,7 +46,7 @@ file_names = []
 cp_lines = []
 for subdir, dirs, files in os.walk(os.getcwd()):
     for file in files:
-        if file.lower().endswith('.sam') and 'RBD' in file and not ('RNA' in subdir.upper() or 'NTD' in file.upper() or 'S1S2' in file.upper() or 'unrep' in file.lower() or 'WWTP_P' in subdir.upper()):
+        if (file.lower().endswith('.sam') or file.lower().endswith('.sam.gz')) and 'RBD' in file and not ('RNA' in subdir.upper() or 'NTD' in file.upper() or 'S1S2' in file.upper() or 'unrep' in file.lower() or 'WWTP_P' in subdir.upper()):
             
             wwtp = ''
             file_split = file.split('.')[0].split('_')
@@ -63,6 +65,8 @@ for subdir, dirs, files in os.walk(os.getcwd()):
                         wwtp = file.split("_")[0]
                         if 'WI' in wwtp.upper():
                             wwtp = 'WI'
+                        elif 'CA' in wwtp.upper():
+                            wwtp = 'CA'
             
             if wwtp in WWTP_dict:
                 amp = 'RBD'
@@ -97,7 +101,10 @@ for subdir, dirs, files in os.walk(os.getcwd()):
                     elif '-' in file_split[2]:
                         date = file_split[2]
                     elif '-' in file_split[0]:
-                        date = file_split[0].split('RBD')[1]
+                        try:
+                            date = file_split[0].split('RBD')[1]
+                        except:
+                            date = file_split[0].strip('CA')
                 except:
                     print('date')
                     print(file)
@@ -130,28 +137,30 @@ for subdir, dirs, files in os.walk(os.getcwd()):
                         month = 10
                     if year == '2022' and month > 10:
                         year = '2021'
-                    # test_fh.write(f"{subdir}/{file}\t{wwtp}_{year}-{month:02d}-{day:02d}_{amp}\n")
                     new_name = f"{WWTP_dict[wwtp][0]}_{year}-{month:02d}-{day:02d}_{amp}"
                     if new_name in file_names:
                         count = 2
                         while (new_name+'-'+str(count)) in file_names:
                             count += 1
                         new_name = new_name+'-'+str(count)
-                        # test_fh.write(f"{subdir}/{file}\t{new_name}\trepeat name\n")
-                    # else:
-                        # test_fh.write(f"{subdir}/{file}\t{new_name}\n")
                     file_names.append(new_name)
                     
                     if not os.path.isdir(os.getcwd()+'/WWTP_Pulls/'+str(WWTP_dict[wwtp][0])+'/'):
                         os.mkdir(os.getcwd()+'/WWTP_Pulls/'+str(WWTP_dict[wwtp][0])+'/')
                     
-                    newfile = f"{os.getcwd()}/WWTP_Pulls/{str(WWTP_dict[wwtp][0])}/{new_name}.{'.'.join(file.split('.')[1:])}"
-                    test_fh.write(f"{subdir}/{file}\t{newfile}")
-                    # os.system(f"cp {subdir}/{file} {newfile}")
-                    test_fh.write(f"\t{os.path.isfile(newfile)}")
+                    ext = 'sam'
+                    if file.endswith('.gz'):
+                        ext = 'sam.gz'
+                    newfile = f"{os.getcwd()}/WWTP_Pulls/{str(WWTP_dict[wwtp][0])}/{new_name}"
+                    test_fh.write(f"{subdir}/{file}\t{newfile}.{ext}")
+                    test_newfile = (os.path.isfile(newfile+'.sam') or os.path.isfile(newfile+'.sam.gz'))
+                    test_fh.write(f"\t{test_newfile}")
                     test_fh.write("\n")
-                    if not (os.path.isfile(newfile)):
-                        cp_lines.append(f"cp {subdir}/{file} {newfile}")
+                    ext = 'sam'
+                    if file.endswith('.gz'):
+                        ext = 'sam.gz'
+                    if not (test_newfile):
+                        cp_lines.append(f"cp {subdir}/{file} {newfile}.{ext}")
             
 test_fh.close()
 print(len(cp_lines))

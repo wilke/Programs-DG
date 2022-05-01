@@ -261,8 +261,8 @@ asdflas = [
 ]
 NTcall_variants = [] # ['C241CandC3037TandC14408CandA23403G'] # [] # ['C24044T'] # ['C1059TandC3543TandC7635GandA18982GandA23013CandA23056CandC23117AandT23119CandA23403GandG23576TandC23604AandC26060T'] # ['C241TandC14408CandA17496CandA22893CandA23013CandA23056CandA23403GandA25020CandA27330CandA28271TandA4178CandA5648CandA6328GandA9204GandC1059TandC11916TandC1616AandC23029TandC23039AandC23054TandC23117AandC23277AandC24044TandC24418TandC25936GandC27920TandC28887TandC3037TandC3267TandC4113TandC4230TandC5178AandC9711TandG11670AandG17196AandG22340AandG22599AandG25019AandG25116AandG25563TandG25947CandG29540AandG3849TandG9479TandT18660CandT22907CandT23031AandT23406CandT25570AandT27322CandT27384CandT27907GandT27929AandT5507GandT8296CandT9982C'] 
 NT_multi_variants = [] # ['C241CandC3037TandC14408CandA23403GandG25563T']
-AA_variants = ["K417", "N440K", "G446S", "L452R", "S477N", "N460K", "K444", "Q493", "E484", "Q498", "1450-1452Del", "N501Y", "Y505H"] # [] # ['GCTA13729-13732Del'] #['L828F'] #    ['K444E', 'D574E'] #
-multi_var =  [] # ['K444TandV445AandY449andL452QandN460KandE484PandF486PandF490YandQ493KandQ498HandQ498YandN501SandN501T']
+AA_variants = ['14408-'] #['CTACAAGTT14408-14416del'] # ['Reference'] # ['L452Q'] # ['GCTA13729-13732Del'] # ["K417"and"N440K"and"G446S"and"L452R"and"S477N"and"N460K"and"K444"and"Q493"and"E484"and"Q498"and"1450-1452Del"and"N501Y"and"Y505H"] # [] # ['L828F'] #    ['K444E'and'D574E'] #
+multi_var = [] # ['N440EandL441RandK444ΔandK444SandK444TandV445ΔandV445AandV445NandG446ΔandG446DandY449HandY449RandY449SandL452KandY453FandL455WandF456LandN460KandT470NandT478RandV483AandV483ΔandE484ΔandE484PandF486AandF486PandF486VandF490HandF490PandF490YandQ493KandQ498HandQ498KandQ498YandP499HandP499SandN501SandN501TandY505NandY508HandH519NandT572IandT572N'] # ['K444TandY449RandN460KandE484AandF486PandQ493KandQ493RandQ498HandQ498YandN501SandN501TandY505H'] # ['440Eand441Rand444Sand445Nand446Dand449Hand449Rand449Sand452Qand452Kand453Fand455Wand456Land484Qand484Pand484Vand486Aand486Pand486Vand490Hand490Pand490Yand494Pand498Hand498Yand498Kand505Nand572I'] # ['K444TandV445AandY449andL452QandN460KandE484PandF486PandF490YandQ493KandQ498HandQ498YandN501SandN501T']
 Omis = {"1" : {'NTD' : ["A67V", "T95I", "425-433Del", "632-634Del", "215EPE"], 'RBD' : ["1251T(K417N)", "1320G(N440K)", "1336A(G446S)", "1430A(S477N)", "1433A(T478K)", "1451C(E484A)", "1478G(Q493R)", "1486A(G496S)", "1493G(Q498R)", "1501T(N501Y)", "1513C(Y505H)", "1640A(T547K)"]},
         "2" : {'NTD' : ["not A67V", "not T95I", "G142D", "not 425-433Del", "not 632-634Del", "V213G"], 'RBD' : ["1251T(K417N)", "1320G(N440K)", "not G446", "1430A(S477N)", "1433A(T478K)", "1451C(E484A)", "1478G(Q493R)", "not G496", "1493G(Q498R)", "1501T(N501Y)", "1513C(Y505H)", "not T547"]},
         "3" : {'NTD' : ["A67V", "T95I", "425-433Del", "632-634Del", "not 215EPE"], 'RBD' : ["1251T(K417N)", "1320G(N440K)", "1336A(G446S)", "1430A(S477N)", "1433A(T478K)", "1451C(E484A)", "1478G(Q493R)", "not G496", "1493G(Q498R)", "1501T(N501Y)", "1513C(Y505H)", "not T547"]}}
@@ -297,8 +297,12 @@ if AA_variants:
     for variant in AA_variants:
         AA_outfiles[variant] = open(samps+"_AA_"+variant+".tsv","w")
 if multi_var:
+    i = 1
     for variant in multi_var:
-        multivar_fhs[variant] = open(samps+"_" + variant + ".tsv","w")
+        multivar_fhs[variant] = open(samps+"_multi"+str(i)+".tsv","w")
+        multivar_fhs[variant].write(variant)
+        multivar_fhs[variant].write("\n")
+        i += 1
 if search_ref == 1:
     ref_fh = open(samps+'_refs.tsv', 'w')
 files_read = []
@@ -308,7 +312,7 @@ for subdir, dirs, files in os.walk(os.getcwd()):
     for file in files:
         if not file in files_read and not 'Assemblies' in subdir:
             files_read.append(file)
-            if (file.endswith('_unique_seqs.tsv') or file.endswith('_reads.tsv') or file.endswith('_covars.tsv') ) and (AA_variants or multi_var or NT_multi_variants): # and not 'wgs' in file:
+            if (file.endswith('_unique_seqs.tsv')) and (AA_variants or multi_var or NT_multi_variants) and not '_AA_' in file: # and not 'wgs' in file:  or file.endswith('_reads.tsv') or file.endswith('_covars.tsv') 
                 in_file = open(os.path.join(subdir, file), "r")
                 NT_multi_matches = {}
                 AA_matches = {}
@@ -324,7 +328,6 @@ for subdir, dirs, files in os.walk(os.getcwd()):
                         splitline[1]
                     except:
                         pass
-                        # samp_line = splitline[0]
                     else:
                         if not splitline[1] == "Count":
                             if NT_multi_variants:
@@ -361,27 +364,28 @@ for subdir, dirs, files in os.walk(os.getcwd()):
                                         except:
                                             NT_multi_matches[variant] = [line]
                             if multi_var:
-                                # if int(splitline[1].split(' ')[0]) < 241:
                                 for variant in multi_var:
                                     mismatch = 0
+                                    match = 0
                                     for PM in variant.split('and'):
                                         if 'not' in PM:
                                             if PM.strip('not') in splitline[ft]:
                                                 mismatch += 1
-                                        # elif PM[0] == PM[-1]:
-                                            # if PM[:-1] in splitline[0]:
-                                                # for nt in ['A', 'T', 'C', 'G', 'N', '-']:
-                                                    # if PM[:-1]+nt in splitline[0]:
-                                                        # mismatch += 1
                                         else:
-                                            if not PM in splitline[ft]:
-                                                mismatch += 1
-                                    if (mismatch <= len(variant.split('and'))-2) and (int(splitline[1]) > 5 or ft == 1) and len(splitline[0].split(" ")) < 20 and splitline[0].count("insert") < 3 and splitline[0].count("Del") < 4:
-                                        try:
-                                            mv_matches[variant].append(line) # str(mismatch) + "\t" + line)
-                                            # counts += int(splitline[1])
-                                        except:
-                                            mv_matches[variant] = [line]
+                                            if PM in splitline[ft]:
+                                                match += 1
+                                            
+                                    if ((match - mismatch) > 1) and len(splitline[ft].split(" ")) < 25 and splitline[ft].count("insert") < 3 and splitline[ft].count("Del") < 4:
+                                        if ft == 1:
+                                            try:
+                                                mv_matches[variant].append(line)
+                                            except:
+                                                mv_matches[variant] = [line]
+                                        elif (int(splitline[1]) >= 4):
+                                            try:
+                                                mv_matches[variant].append(line)
+                                            except:
+                                                mv_matches[variant] = [line]
                             if AA_variants:
                                 for variant in AA_variants:
                                     if variant in splitline[ft] and (int(splitline[1]) > 4 or ft == 1):
@@ -396,16 +400,16 @@ for subdir, dirs, files in os.walk(os.getcwd()):
                         NT_mult_outfiles[variant].write("\n")
                         for line in NT_multi_matches[variant]:
                             NT_mult_outfiles[variant].write(line)
-                if mv_matches: # and counts > 9:
+                if mv_matches:
                     for variant in mv_matches:
-                        multivar_fhs[variant].write(file[:-4]+"\t")
+                        multivar_fhs[variant].write(subdir+"/"+file[:-4]+"\t")
                         multivar_fhs[variant].write("\n")
                         for line in mv_matches[variant]:
                             multivar_fhs[variant].write(line)
                 if AA_matches:
                     for variant in AA_matches:
                         if AA_matches[variant]:
-                            AA_outfiles[variant].write(file[:-4]+"\n")
+                            AA_outfiles[variant].write(subdir+file+"\n")
                             for line in AA_matches[variant]:
                                 AA_outfiles[variant].write(line)
 

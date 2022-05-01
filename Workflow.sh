@@ -38,7 +38,6 @@ do
 		# Sampid=$(echo $file | cut -d "." -f 1-4 )
 		echo $Sampid
 		# echo $Sampid &>> derepinfo.txt
-		# /mnt/g/MU_WW/vsearch/bin/vsearch --derep_fulllength $Sampid.merge.fq --output $Sampid.all.derep.fa --sizeout --minuniquesize 1
 		/mnt/g/MU_WW/vsearch/bin/vsearch --derep_fulllength $Sampid.merge.fq --output $Sampid.derep.fa --sizeout --minuniquesize 100 &>> derepinfo.txt
 		# echo '   ' &>> derepinfo.txt
 		# Sampid=$(echo $file| cut -d "_" -f 1-3 )
@@ -77,6 +76,7 @@ mkdir NY
 mkdir rRNA
 mkdir Mix
 mkdir NulOmi
+# mkdir primer_tests
 
 # # mv 26W_* ./NY/
 # # mv 0TI_* ./NY/
@@ -135,12 +135,17 @@ cd NY
 	mkdir Mix
 	mkdir S1S2
 	mkdir NulOmi
+	mkdir NTD
+	mkdir RBD
 	mv *alt* ./NulOmi/
 	mv *Alt* ./NulOmi/
 	mv *ALT* ./NulOmi/
 	mv *RBD*NTD* ./Mix/
+	mv *NTD*S1S2* ./Mix/
+	mv *NTD*.* ./NTD/
 	mv *S1S2*.* ./S1S2/
 	mv *S1S1*.* ./S1S2/
+	mv *RBD*.* ./RBD/
 
 	mv *12s* ./rRNA/
 	mv *16s* ./rRNA/
@@ -151,23 +156,32 @@ cd NY
 		python /mnt/g/MU_WW/Programs/MixedSAMSplit.py
 		mkdir RBD
 		mkdir NTD
+		mkdir S1S2
 		mv *RBD.sam ./RBD/
 		mv *NTD.sam ./NTD/
+		mv *S1S2.sam ./S1S2/
 		cd RBD
 			python /mnt/g/MU_WW/SAM_Refiner/SAM_Refiner.py -r /mnt/g/MU_WW/SARS2/GP.fasta --colID=${calid}_NYMixRBD --alpha 1.6 --foldab .6 --mp 4
 		cd ..
 		cd NTD
 			python /mnt/g/MU_WW/SAM_Refiner/SAM_Refiner.py -r /mnt/g/MU_WW/SARS2/GP.fasta --colID=${calid}_NYMixNTD --alpha 1.6 --foldab .6 --mp 4
 		cd ..
+		cd S1S2
+			python /mnt/g/MU_WW/SAM_Refiner/SAM_Refiner.py -r /mnt/g/MU_WW/SARS2/GP.fasta --colID=${calid}_NYMixS1S2 --alpha 1.6 --foldab .6 --mp 4
+		cd ..
 	cd ..
-	# cd S1S2
-		# python /mnt/g/MU_WW/SAM_Refiner/SAM_Refiner.py -r /mnt/g/MU_WW/SARS2/GP.fasta --colID=${calid}_NY_S1S2 --alpha 1.6 --foldab .6 --mp 4
-	# cd ..
+	cd NTD
+		python /mnt/g/MU_WW/SAM_Refiner/SAM_Refiner.py -r /mnt/g/MU_WW/SARS2/GP.fasta --colID=${calid}_NY_NTD --alpha 1.6 --foldab .6 --mp 4
+	cd ..
+	cd S1S2
+		python /mnt/g/MU_WW/SAM_Refiner/SAM_Refiner.py -r /mnt/g/MU_WW/SARS2/GP.fasta --colID=${calid}_NY_S1S2 --alpha 1.6 --foldab .6 --mp 4
+	cd ..
 	cd NulOmi
 		python /mnt/g/MU_WW/SAM_Refiner/SAM_Refiner.py -r /mnt/g/MU_WW/SARS2/GP.fasta --colID=${calid}_NY_RBD_NullOmi --alpha 1.6 --foldab .6 --mp 4
 	cd ..
-
-	python /mnt/g/MU_WW/SAM_Refiner/SAM_Refiner.py -r /mnt/g/MU_WW/SARS2/GP.fasta --colID=${calid}_NY_RBD --alpha 1.6 --foldab .6 --mp 4
+	cd RBD
+		python /mnt/g/MU_WW/SAM_Refiner/SAM_Refiner.py -r /mnt/g/MU_WW/SARS2/GP.fasta --colID=${calid}_NY_RBD --alpha 1.6 --foldab .6 --mp 4
+	cd ..
 
 cd ..
 
