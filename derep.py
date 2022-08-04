@@ -30,9 +30,10 @@ args = parser.parse_args()
 
 seq_dict = {}
 total_reads = 0
-# firstline = args.in_file.readline()
-if args.in_file.startswith('>'):
-    cur_seq = ''
+first_line = args.in_file.readline()
+args.in_file.seek(0)
+if first_line.startswith('>'):
+    cur_seq = ""
     for line in args.in_file:
         if line.startswith('>') and cur_seq:
             try:
@@ -48,26 +49,41 @@ if args.in_file.startswith('>'):
             seq_dict[cur_seq] += 1
         except:
             seq_dict[cur_seq] = 1
-        
-elif args.in_file.startswith('@'):
-    mode = 'seq'
-    cur_seq = ''
-    for line in args.in_file:
-        if mode == 'seq':
-            if line.startswith('+'):
-                mode = 'qual'
+
+elif first_line.startswith("@"):
+
+    seq_id = ""
+    sequence = ""
+    seq_q_id = ""
+    qual = ""
+    file_reading = True
+    while(file_reading):
+        try:
+            seq_id = args.in_file.readline()
+            sequence = args.in_file.readline()
+            seq_q_id = args.in_file.readline()
+            qual = args.in_file.readline()
+        except Exception as e:
+            print(e)
+            print("Error in reading file")
+            file_reading = False
+            break
+        else:
+            if seq_id == "":
+                # EOF
+                file_reading = False
+                break
+            elif seq_id.startswith("@") and seq_q_id.startswith("+"):
                 try:
-                    seq_dict[cur_seq] += 1
+                    seq_dict[sequence.strip("\n\r")] += 1
                 except:
-                    seq_dict[cur_seq] = 1
-                cur_seq = ''
+                    seq_dict[sequence.strip("\n\r")] = 1
                 total_reads += 1
             else:
-                cur_seq += line.strip('\n\r')
-        elif mode == 'qual':
-            if line.startswith('@'):
-                mode = 'seq'
-                
+                print("Error in reading FASTQ format.")
+                file_reading = False
+                break
+
 else:
     print('input file not recognized as fasta/q')
 args.in_file.close()

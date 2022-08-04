@@ -29,7 +29,9 @@ omicron_mutations = [ ## Original From Rose
     'NL211-212I-',
     'N211I',
     'L212-',
+    'L212V',
     'V213G',
+    'V213R',
     '215EPE',
     '215E',
     '215P',
@@ -48,7 +50,8 @@ omicron_mutations = [ ## Original From Rose
     'Q498R',
     'N501Y',
     'Y505H',
-    'T547K'
+    'T547K',
+    'H655Y'
 ]
 omicron_positions = [
     '19',
@@ -84,7 +87,8 @@ omicron_positions = [
     '498',
     '501',
     '505',
-    '547'
+    '547',
+    '655'
     ]
 
 def mut_pos_stringer(muts):
@@ -104,8 +108,8 @@ def load_deconv(file_name): ## From Rose
     filter out sequences with fewer than 5 mutations, melt to long format
     returns the filtered raw file with frequencies and the long format file'''
     # load data, rename columns, drop the rows called "Covariant" and "Reference"
-    df_raw = pd.read_csv(file_name, sep='\t')
-    # df_raw = df_raw.rename(columns={'Unnamed: 0':'mutations'})
+    df_raw = pd.read_csv(file_name, sep='\t', header=None, names=('Sample', 'Sequence'))
+    # df_raw = df_raw.rename(columns={'Unnamed: 1' : 'Sequence'})
     # df_raw = df_raw[~df_raw.mutations.isin(['Covariant', 'Reference'])]
 
     # make column with count of mutations and then filter out seqs with < 5 mutations
@@ -139,13 +143,13 @@ def load_deconv(file_name): ## From Rose
     return df_raw # , df
 
 for file in os.listdir(os.getcwd()):
-    if file == 'LongReads_reads_trimmedv3.tsv': #.endswith('_trimmedv2.tsv'):
+    if file == 'S1s_reads.tsv': #.endswith('_trimmedv2.tsv'):
 
         ####
         ####  Original plotting from Rose
         ####
         df_raw = load_deconv(file)
-
+        # print(df_raw)
         seq_num = df_raw.shape[0]
 
         df_raw['PMs'] = df_raw.Sequence.apply(lambda x: x.split(' '))
@@ -153,8 +157,8 @@ for file in os.listdir(os.getcwd()):
 
         pat_SCP = re.compile(r'\(((\D)(\d+)(\w))\)')
         pat_ins = re.compile(r'insert\w+\(((\d+)(\w+))\)')
-        pat_ins1 = re.compile(r'insert\w+\(((\w)(\d+)(\w+))\)')
-        pat_del = re.compile(r'\(((\w)(\d+))-\)')
+        pat_ins1 = re.compile(r'\w+insert\(((\w)(\d+)(\w+))insert\)')
+        pat_del = re.compile(r'\(((\w)(\d+))del\)')
         pat_MCP = re.compile(r'\(((\D+)(\d+)-(\d+)(\D+))\)')
         new_entries = []
         for row in df.itertuples():
@@ -213,7 +217,7 @@ for file in os.listdir(os.getcwd()):
                         Omi = 'Omicron Position'
                     i = 1
                     for AA in mut:
-                        newposition = str(int(position)+1) +'.'+str(i)
+                        newposition = str(int(position)) +'.'+str(i)
                         new_entries.append([row.seq_id, row.Sample, '-'+newposition, float(newposition), wt, AA, Omi])
                         i += 1
                     continue
@@ -224,7 +228,7 @@ for file in os.listdir(os.getcwd()):
                     wt = exp[1]
                     wt_pos = exp[1]+exp[2]
                     mut = 'Δ'
-                    if exp[0] in omicron_mutations:
+                    if (exp[0]+'-') in omicron_mutations:
                         Omi = 'Omicron Mutation'
                     elif exp[2] in omicron_positions:
                         Omi = 'Omicron Position'
@@ -234,6 +238,8 @@ for file in os.listdir(os.getcwd()):
                     wt = exp[1]
                     wt_pos = 'x'
                     mut = exp[4]
+                    if 'del' in mut:
+                        mut = mut.strip("del")
                     # if len(mut) == len(wt):
                     for i in range(0, len(wt)):
                         try:
@@ -256,6 +262,7 @@ for file in os.listdir(os.getcwd()):
                         # print(new_entries[-1])
                         Omi = 'Non-Omicron'
                     if len(mut) > len(wt):
+                        print(pm)
                         mut = mut[i+1:]
                         wt = '-'
                         position = int(position) + i + 1 
@@ -292,10 +299,10 @@ for file in os.listdir(os.getcwd()):
         pm_num = df_long.wt_pos.nunique()
         colors = ['#111111', '#d55e00', '#009e73']
 
-        fig = (ggplot(df_long, aes(x='wt_pos', y='Sample'))+ # , color='Omicron Residues', limitsize=False
-         geom_tile(aes(width=.9, height=.9), size=1, linetype='solid', fill='white', color='black')+ #
+        fig = (ggplot(df_long, aes(x='wt_pos', y='Sample', color='Omicron Residues'))+ # , limitsize=False
+         geom_tile(aes(width=.9, height=.9), size=1, linetype='solid', fill='white')+ # , color='black'
          geom_text(aes(label='mutation_aa'), color='black', size=7)+
-         # scale_color_manual(values=colors, drop=False, breaks=['Non-Omicron', 'Omicron Mutation', 'Omicron Position'])+
+         scale_color_manual(values=colors, drop=False, breaks=['Non-Omicron', 'Omicron Mutation', 'Omicron Position'])+
          xlab("Position")+
          ylab('')+
          theme_classic()+

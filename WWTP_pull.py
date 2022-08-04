@@ -23,7 +23,8 @@ WWTP_dict = {   2 : [1, "BB", "Queens"],
                 '033' : [33, 'CC', 'St. Louis'],
                 '045' : [45, 'Lower Meramec', 'Lower Meramec'],
                 'WI' : ['WI', 'WI', 'WI'],
-                'CA' : ['Cali', 'Cali', 'Cali']
+                'CA' : ['Cali', 'Cali', 'Cali'],
+                'VA' : ['VA', 'VA', 'VA']
 }
 WWTP_dict2 = {   "BB" : 2,
                 "HP" : 4,
@@ -46,8 +47,8 @@ file_names = []
 cp_lines = []
 for subdir, dirs, files in os.walk(os.getcwd()):
     for file in files:
-        if (file.lower().endswith('.sam') or file.lower().endswith('.sam.gz')) and 'RBD' in file and not ('RNA' in subdir.upper() or 'NTD' in file.upper() or 'S1S2' in file.upper() or 'unrep' in file.lower() or 'WWTP_P' in subdir.upper()):
-            
+        if (file.lower().endswith('.sam') or file.lower().endswith('.sam.gz')) and ('RBD' in file or '2493' in file) and not ('RNA' in subdir.upper() or 'NTD' in file.upper() or 'S1S2' in file.upper() or 'unrep' in file.lower() or 'WWTP_P' in subdir.upper()):
+
             wwtp = ''
             file_split = file.split('.')[0].split('_')
             if "NY" in file:
@@ -55,7 +56,7 @@ for subdir, dirs, files in os.walk(os.getcwd()):
                     wwtp = int(file_split[0].strip("NYRBDA"))
                 except:
                     print(subdir+file)
-            else: 
+            else:
                 try:
                     wwtp = WWTP_dict2[file.split("_")[0].strip("0d")]
                 except:
@@ -67,7 +68,9 @@ for subdir, dirs, files in os.walk(os.getcwd()):
                             wwtp = 'WI'
                         elif 'CA' in wwtp.upper():
                             wwtp = 'CA'
-            
+                        elif 'VA' in wwtp.upper():
+                            wwtp = 'VA'
+
             if wwtp in WWTP_dict:
                 amp = 'RBD'
                 # if 'RBD' in file.upper():
@@ -92,8 +95,10 @@ for subdir, dirs, files in os.walk(os.getcwd()):
                     # pass
                 # else:
                     # amp = 'RBD'
+                if '2493' in file:
+                    amp = '2493'
                 if 'alt' in file.lower() or 'nulomi' in subdir.lower():
-                    amp = 'RBDalt'
+                    amp += 'alt'
                 date = ''
                 try:
                     if '-' in file_split[1]:
@@ -104,11 +109,11 @@ for subdir, dirs, files in os.walk(os.getcwd()):
                         try:
                             date = file_split[0].split('RBD')[1]
                         except:
-                            date = file_split[0].strip('CA')
+                            date = file_split[0].strip('CAV')
                 except:
                     print('date')
                     print(file)
-                
+
                 if amp and date:
                     month = ''
                     day = ''
@@ -144,10 +149,10 @@ for subdir, dirs, files in os.walk(os.getcwd()):
                             count += 1
                         new_name = new_name+'-'+str(count)
                     file_names.append(new_name)
-                    
+
                     if not os.path.isdir(os.getcwd()+'/WWTP_Pulls/'+str(WWTP_dict[wwtp][0])+'/'):
                         os.mkdir(os.getcwd()+'/WWTP_Pulls/'+str(WWTP_dict[wwtp][0])+'/')
-                    
+
                     ext = 'sam'
                     if file.endswith('.gz'):
                         ext = 'sam.gz'
@@ -161,7 +166,7 @@ for subdir, dirs, files in os.walk(os.getcwd()):
                         ext = 'sam.gz'
                     if not (test_newfile):
                         cp_lines.append(f"cp {subdir}/{file} {newfile}.{ext}")
-            
+
 test_fh.close()
 print(len(cp_lines))
 for line in cp_lines:

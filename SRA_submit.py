@@ -256,7 +256,6 @@ for file in os.listdir(os.getcwd()):
 
         fh_biosamps_in.close()
 
-
 sampnames = []
 out_file = open("SRA_sub_list.tsv", "w")
 out_file.write("library_ID\ttitle\tlibrary_strategy\tlibrary_source\tlibrary_selection\tlibrary_layout\tplatform\tinstrument_model\tdesign_description\tfiletype\tfilename\tfilename2\tbiosample_accession")
@@ -270,6 +269,8 @@ for file in os.listdir(os.getcwd()):
         if 'RBD' in file.upper():
             if 'NTD' in file.upper() or 'S1S2' in file.upper():
                 domain = 'Mixed'
+            elif 'ALT' in file.upper():
+                domain = 'ALTRBD'
             else:
                 domain = 'RBD'
         elif 'MIX' in file.upper():
@@ -281,6 +282,8 @@ for file in os.listdir(os.getcwd()):
                 domain = 'NTD'
         elif 'S1S2' in file.upper():
             domain = 'S1S2'
+        elif "2493" in file:
+            domain = "RBD"
         else:
             print(f"no domain found for {file}")
 
@@ -296,6 +299,8 @@ for file in os.listdir(os.getcwd()):
                 Date = splitname[1].upper().split('NTD')[0]
             elif 'S1S2' in splitname[1]:
                 Date = splitname[1].upper().split('S1S2')[0]
+            else:
+                Date = splitname[1].upper().split('ALT')[0].split("2493")[0]
         try:
             Date
             site
@@ -365,16 +370,15 @@ for file in os.listdir(os.getcwd()):
             except:
                 ww_pop = 'Not Collected'
 
-            # if "RBD" in file and "NTD" in file and "S1S2" in file:
-                # out_file.write("Mixed Spike N-Terminus Domain, Receptor Binding Domain and S1S2 Junction Domain amplicons")
-            if "RBD" in file and "NTD" in file:
-                out_file.write("Mixed Spike N-Terminus Domain and Receptor Binding Domain amplicons")
-            elif "RBD" in file:
-                out_file.write("Spike Receptor Binding Domain amplicon")
-            elif "NTD" in file:
-                out_file.write("Spike N-Terminus Domain amplicon")
-            else:
-                out_file.write("Spike S1-S2 Junction Domain amplicon")
+            domain_out_dict = {
+                "RBD" : "Spike Receptor Binding Domain amplicon",
+                "ALTRBD" : "Alternative Spike Receptor Binding Domain amplicon",
+                "NTD" : "Spike N-Terminus Domain amplicon",
+                "S1S2" : "Spike S1-S2 Junction Domain amplicon",
+                "Mixed" : "Mixed Spike Domain amplicons"
+                }
+            
+            out_file.write(domain_out_dict[domain])
             out_file.write(f"\tAmplicon\tViral RNA\tRT-PCR\tPaired\tIllumina\tIllumina MiSeq\tDomain Amplification\tfastq\t{file}\t" + "_".join(splitname[0:-2]) + "_R2_001.fastq.gz")
             out_file.write(f"\t{newbiosampacc}")
             out_file.write("\twastewater metagenome")

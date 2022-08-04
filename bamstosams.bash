@@ -3,24 +3,25 @@
 samp=''
 for file in *
 do
-	if [ -d $file ]
+	# if [ -d $file ]
+	# then
+		# echo $file
+		# cd $file
+		# for xfile in *
+		# do
+
+	if [[ $file == *.bam ]]
 	then
 		echo $file
-		cd $file
-		for xfile in *
-		do
-			samp=$(echo $file | cut -d "_" -f 1 )
-			if [[ $xfile == *.bam ]]
-			then
-				echo $xfile
-				echo $samp
-				samtools view $xfile > $samp.sam
-			fi
-
-		done
-
-		cd ..
+		samp=$(echo $file | cut -d "." -f 1 )
+		echo $samp
+		samtools view $file > $samp.sam
 	fi
+
+		# done
+
+		# cd ..
+	# fi
 
 
 done
