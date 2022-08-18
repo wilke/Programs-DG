@@ -196,7 +196,7 @@ cd Mix
 	cd ..
 cd ..
 cd RBD
-python /mnt/g/MU_WW/SAM_Refiner/SAM_Refiner.py -r /mnt/g/MU_WW/SARS2/GP.fasta --colID=${calid}_RBD --alpha 1.6 --foldab .6 --mp 4 --collect 0
+python /mnt/g/MU_WW/SAM_Refiner/SAM_Refiner.py -r /mnt/g/MU_WW/SARS2/GP.fasta --colID=${calid}_RBD --alpha 1.6 --foldab .6 --mp 4
 cd ..
 cd NTD
 python /mnt/g/MU_WW/SAM_Refiner/SAM_Refiner.py -r /mnt/g/MU_WW/SARS2/GP.fasta --colID=${calid}_NTD --alpha 1.6 --foldab .6 --mp 4
@@ -205,13 +205,13 @@ cd S1S2
 python /mnt/g/MU_WW/SAM_Refiner/SAM_Refiner.py -r /mnt/g/MU_WW/SARS2/GP.fasta --colID=${calid}_S1S2 --alpha 1.6 --foldab .6 --mp 4
 cd ..
 cd NulOmi
-python /mnt/g/MU_WW/SAM_Refiner/SAM_Refiner.py -r /mnt/g/MU_WW/SARS2/GP.fasta --colID=${calid}_RBD_NulOmi --alpha 1.6 --foldab .6 --mp 4 --collect 0
+python /mnt/g/MU_WW/SAM_Refiner/SAM_Refiner.py -r /mnt/g/MU_WW/SARS2/GP.fasta --colID=${calid}_RBD_NulOmi --alpha 1.6 --foldab .6 --mp 4
 cd ..
 cd preRBD
-python /mnt/g/MU_WW/SAM_Refiner/SAM_Refiner.py -r /mnt/g/MU_WW/SARS2/GP.fasta --colID=${calid}_preRBD --alpha 1.6 --foldab .6 --mp 4 --collect 0
+python /mnt/g/MU_WW/SAM_Refiner/SAM_Refiner.py -r /mnt/g/MU_WW/SARS2/GP.fasta --colID=${calid}_preRBD --alpha 1.6 --foldab .6 --mp 4
 cd ..
 cd 828
-python /mnt/g/MU_WW/SAM_Refiner/SAM_Refiner.py -r /mnt/g/MU_WW/SARS2/GP.fasta --colID=${calid}_R828 --alpha 1.6 --foldab .6 --mp 4 --collect 0
+python /mnt/g/MU_WW/SAM_Refiner/SAM_Refiner.py -r /mnt/g/MU_WW/SARS2/GP.fasta --colID=${calid}_R828 --alpha 1.6 --foldab .6 --mp 4
 cd ..
 echo 'SAM processing done'
 

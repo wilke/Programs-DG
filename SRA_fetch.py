@@ -23,8 +23,8 @@ def fetch(SRA_ID):
     if os.path.isfile(SRA_ID+'.collapsed.fa.gz') or os.path.isfile(SRA_ID+'.collapsed.fa'):
         print(SRA_ID+" found")
         if not os.path.isfile(SRA_ID+'.SARS2.wg.sam'):
-            # if not os.path.isfile(SRA_ID+'.collapsed.fa.gz'):
-                # os.system('gzip ' +SRA_ID+'.collapsed.fa')
+            if not os.path.isfile(SRA_ID+'.collapsed.fa.gz'):
+                os.system('gzip ' +SRA_ID+'.collapsed.fa')
             os.system("minimap2 -a /mnt/g/MU_WW/SARS2/SARS2.fasta "+SRA_ID+".collapsed.fa.gz --sam-hit-only --secondary=no -o "+SRA_ID+".SARS2.wg.sam")
             # os.system("gzip *.fa")
             os.system("rm " + SRA_ID + "*fastq")
@@ -83,5 +83,7 @@ SRA_IDs = []
 for line in args.file:
     SRA_IDs.append(line.strip("\n\r"))
 
-with Pool(processes=3) as pool:
-    pool.starmap(fetch, zip(SRA_IDs))
+for SRA in SRA_IDs:
+    fetch(SRA)
+# with Pool(processes=1) as pool:
+    # pool.starmap(fetch, zip(SRA_IDs))

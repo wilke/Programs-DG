@@ -29,6 +29,6 @@ for subdir, dirs, files in os.walk(os.getcwd()):
             if ((not os.path.isfile(os.path.join(subdir, SRA+'.SARS2.wg_nt_calls.tsv'))) or (not os.path.isfile(os.path.join(subdir, SRA+'.SARS2.wg_unique_seqs.tsv')))) and os.path.isfile(os.path.join(subdir, SRA+'.SARS2.wg.sam')):
                 sam_files.append(os.path.join(subdir, SRA+'.SARS2.wg.sam'))
     print(len(sam_files))
-    with Pool(processes=4) as pool:
+    with Pool(processes=3) as pool:
         pool.starmap(SRR_proc, zip(itertools.repeat(subdir), sam_files))
 

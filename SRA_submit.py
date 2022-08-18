@@ -267,10 +267,12 @@ for file in os.listdir(os.getcwd()):
 
         domain = ''
         if 'RBD' in file.upper():
-            if 'NTD' in file.upper() or 'S1S2' in file.upper():
+            if 'NTD' in file.upper() or 'S1S2' in file.upper() or 'RBD_M_' in file.upper():
                 domain = 'Mixed'
             elif 'ALT' in file.upper():
                 domain = 'ALTRBD'
+            elif 'PRERBD' in file.upper():
+                domain = 'PreRBD'
             else:
                 domain = 'RBD'
         elif 'MIX' in file.upper():
@@ -284,6 +286,10 @@ for file in os.listdir(os.getcwd()):
             domain = 'S1S2'
         elif "2493" in file:
             domain = "RBD"
+        elif "M" in splitname[1]:
+            domain = "M"
+        elif splitname[1].endswith("828"):
+            domain = "828"
         else:
             print(f"no domain found for {file}")
 
@@ -294,13 +300,17 @@ for file in os.listdir(os.getcwd()):
             site = splitname[0].upper().strip('ABCDOC-')
 
             if 'RBD' in splitname[1]:
-                Date = splitname[1].upper().split('RBD')[0].strip('ALT')
+                Date = splitname[1].upper().split('RBD')[0].strip('ALTPRE')
             elif 'NTD' in splitname[1]:
-                Date = splitname[1].upper().split('NTD')[0]
+                Date = splitname[1].upper().split('NTD')[0].strip("R")
             elif 'S1S2' in splitname[1]:
-                Date = splitname[1].upper().split('S1S2')[0]
+                Date = splitname[1].upper().split('S1S2')[0].strip("R")
+            elif splitname[1].endswith("M"):
+                Date = splitname[1].upper().strip("M")
+            elif splitname[1].endswith("828"):
+                Date = splitname[1].upper().split("828")[0].strip("R")
             else:
-                Date = splitname[1].upper().split('ALT')[0].split("2493")[0]
+                Date = splitname[1].upper().split('ALT')[0].split("2493")[0].strip("R")
         try:
             Date
             site
@@ -375,7 +385,10 @@ for file in os.listdir(os.getcwd()):
                 "ALTRBD" : "Alternative Spike Receptor Binding Domain amplicon",
                 "NTD" : "Spike N-Terminus Domain amplicon",
                 "S1S2" : "Spike S1-S2 Junction Domain amplicon",
-                "Mixed" : "Mixed Spike Domain amplicons"
+                "Mixed" : "Mixed Domain amplicons",
+                "828" : "Amino acid 828 domain amplicon",
+                "M" : "M amplicon",
+                "PreRBD" : "PreRBD Domain amplicon",
                 }
             
             out_file.write(domain_out_dict[domain])
