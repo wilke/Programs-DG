@@ -42,7 +42,7 @@ do
 		Sampid=$(echo $file | rev | cut -d "_" -f 3- | rev )
 		echo $Sampid
 		echo $file
-		bash ../BBTools/BBMap/bbmerge.sh in1=$file in2=${Sampid}_R2_001.fastq.gz  out=$Sampid.merge.fq &>> $Sampid.mergestats.txt
+		bash ../bbmap/bbmerge.sh in1=$file in2=${Sampid}_R2_001.fastq.gz  out=$Sampid.merge.fq &>> $Sampid.mergestats.txt
 		mv $file ./Merged/$file
 		mv ${Sampid}_R2_001.fastq.gz ./Merged/${Sampid}_R2_001.fastq.gz
 		echo $Sampid
