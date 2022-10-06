@@ -300,7 +300,7 @@ for file in os.listdir(os.getcwd()):
             site = splitname[0].upper().strip('ABCDOC-')
 
             if 'RBD' in splitname[1]:
-                Date = splitname[1].upper().split('RBD')[0].strip('ALTPRE')
+                Date = splitname[1].upper().split('RBD')[0].strip('ALTPRENEW')
             elif 'NTD' in splitname[1]:
                 Date = splitname[1].upper().split('NTD')[0].strip("R")
             elif 'S1S2' in splitname[1]:

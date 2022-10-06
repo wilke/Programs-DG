@@ -12,7 +12,7 @@ try:
     done_SRAs_fh.close()
 except:
     pass
-    
+
 try:
     done_SRAs_fh = open('Done_SRAs.csv', 'r')
     for line in done_SRAs_fh:
@@ -21,25 +21,38 @@ try:
     done_SRAs_fh.close()
 except:
     pass
-
 todo_SRAs = []
 try:
     table_fh = open('SraRunTable.csv', 'r')
     outfile = open('Table_clean.csv', 'w')
     for line in table_fh:
         SRR = line.split(',')[0]
-        if (not SRR in done_SRAs) and (not ('PRJNA748354' in line or 'PRJNA715712' in line or 'PRJNA809641' in line)):
+        if (not SRR in done_SRAs) and (not ('PRJNA748354' in line or 'PRJNA715712' in line or 'PRJNA809641' in line or "PRJNA867408" in line)):
             outfile.write(line)
             if not SRR.lower() == 'run':
                 todo_SRAs.append(SRR)
-        if 'PRJNA748354' in line or 'PRJNA715712' in line:
-            if SRR not in done_SRAs:
-                done_SRAs.append(SRR)
+        elif SRR not in done_SRAs:
+            done_SRAs.append(SRR)
     outfile.close()
     table_fh.close()
 except:
     pass
-    
+
+try:
+    table_fh = open('SraRunInfo.csv', 'r')
+    outfile = open('Info_clean.csv', 'w')
+    for line in table_fh:
+        SRR = line.split(',')[0]
+        if (not SRR in done_SRAs) and (not ('PRJNA748354' in line or 'PRJNA715712' in line or 'PRJNA809641' in line or "PRJNA867408" in line)):
+            outfile.write(line)
+            if not SRR.lower() == 'run':
+                todo_SRAs.append(SRR)
+        elif not SRR in done_SRAs:
+            done_SRAs.append(SRR)
+    outfile.close()
+    table_fh.close()
+except:
+    pass
 outfile = open('List_clean.txt', 'w')
 try:
     list_fh = open('SRR_Acc_List.txt', 'r')
@@ -53,4 +66,4 @@ except:
         outfile.write("\n")
 
 outfile.close()
-    
+

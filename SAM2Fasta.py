@@ -17,7 +17,7 @@ parser.add_argument(
 args = parser.parse_args()
 file_names = []
 if args.file:
-    file_names = [(args.file.name)[:-4]]
+    file_names = [args.file]
 else:
     for file in os.listdir(os.getcwd()):
         if file.endswith('.sam'):

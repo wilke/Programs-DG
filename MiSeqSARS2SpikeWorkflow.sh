@@ -4,7 +4,7 @@
 # bash to execute pipeline to download and process
 # MiSeq reads of Spike amplicons
 # required: custom scripts; Pullfastqgz, derep, MixedSAMSplit
-# BBTools/BBMap/bbmerge
+# bbmap/bbmerge
 # cutadapt
 # minimap2
 # SAM Refiner
