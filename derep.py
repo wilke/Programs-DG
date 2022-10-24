@@ -35,12 +35,13 @@ args.in_file.seek(0)
 if first_line.startswith('>'):
     cur_seq = ""
     for line in args.in_file:
-        if line.startswith('>') and cur_seq:
-            try:
-                seq_dict[cur_seq] += 1
-            except:
-                seq_dict[cur_seq] = 1
-            cur_seq = ''
+        if line.startswith('>'):
+            if cur_seq:
+                try:
+                    seq_dict[cur_seq] += 1
+                except:
+                    seq_dict[cur_seq] = 1
+                cur_seq = ''
             total_reads += 1
         else:
             cur_seq += line.strip('\n\r')

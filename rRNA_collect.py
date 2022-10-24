@@ -12,7 +12,7 @@ for line in spec_dict_file:
 spec_dict_file.close()
 
 for file in os.listdir(os.getcwd()):
-    if (file.lower()).endswith('.sam'):
+    if (file.lower()).endswith('bt.sam'):
         SAMs.append(file)
 
 Species_dict_dict = {}
@@ -33,29 +33,29 @@ if SAMs:
                 except:
                     pass
                 else:
-                    if splitline[1] == "0" or splitline[1] == "16" or splitline[1] == "4":
+                    if (splitline[1] == "0" or splitline[1] == "16" or splitline[1] == "4") and len(splitline[9]) == 110:
                         species = 'Unmatched'
-                        counts = int(splitline[0].split('=')[-1])
+                        counts = int(splitline[0].split('-')[-1])
                         total += counts
                         matchline = splitline[2].split('_')
                         if matchline[0] == "*":
                             species = 'Unmatched'
-                        elif 'de:f:' in line:
-                            if float(splitline[19][5:]) > .02:
-                                species = 'Poor match'
-                            else:
-                                if matchline[2] == "PREDICTED:":
-                                    species = matchline[3]+' '+matchline[4]
-                                elif matchline[1][0].isdigit():
-                                    species = matchline[2]+" "+matchline[3]
-                                else:
-                                    species = matchline[1]+' '+matchline[2]
-                        elif matchline[2] == "PREDICTED:":
-                            species = matchline[3]+' '+matchline[4]
-                        elif matchline[1][0].isdigit():
-                            species = matchline[2]+" "+matchline[3]
+                        # elif 'de:f:' in line:
+                            # if float(splitline[19][5:]) > .02:
+                                # species = 'Poor match'
+                            # else:
+                                # if matchline[2] == "PREDICTED:":
+                                    # species = matchline[3]+' '+matchline[4]
+                                # elif matchline[1][0].isdigit():
+                                    # species = matchline[2]+" "+matchline[3]
+                                # else:
+                                    # species = matchline[1]+' '+matchline[2]
+                        # elif matchline[2] == "PREDICTED:":
+                            # species = matchline[3]+' '+matchline[4]
+                        # elif matchline[1][0].isdigit():
+                            # species = matchline[2]+" "+matchline[3]
                         else:
-                            species = matchline[1]+' '+matchline[2]
+                            species = splitline[2]# matchline[1]+' '+matchline[2]
                         all_species[species] = 1
                         try:
                             Species_dict_dict[samp_name][species] += counts
