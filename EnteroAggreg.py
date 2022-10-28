@@ -37,14 +37,16 @@ if SAMs:
                         # else:
                             # species = splitline[2]
                         try:
-                            all_species[species]
+                            all_species[species]["total"] += counts
                         except:
-                        
-                            all_species[species] = matchline
+                            all_species[species] = {
+                                        "total" : counts,
+                                        "match" : matchline,
+                                        }
                         else:
-                            if not matchline in all_species[species]:
-                                print(f"different mapping of {species} to {all_species[species]} and {matchline}")
-                                all_species[species] += "+"+matchline
+                            if not matchline in all_species[species]["match"]:
+                                print(f"different mapping of {species} to {all_species[species]['match']} and {matchline}")
+                                all_species[species]["match"] += "+"+matchline
                         
                         try:
                             Species_dict_dict[samp_name][species] += counts
@@ -55,7 +57,7 @@ if SAMs:
 
 if all_species:
     rs_fh = open('Enteros.tsv', "w")
-    rs_fh.write(f"Sequence\tmatch")
+    rs_fh.write(f"Sequence\tmatch\tTotal Coun t")
     for samps in Species_dict_dict:
         rs_fh.write(f"\t{samps}({Species_dict_dict[samps]['total']})\t")
     rs_fh.write("\n")
@@ -63,13 +65,17 @@ if all_species:
     for samps in Species_dict_dict:
         rs_fh.write(f"\tCount\tAbundance")
     rs_fh.write("\n")
-    sorted_species = sorted(all_species, key=lambda x: all_species[x])
+    sorted_species = sorted(all_species, key=lambda x: all_species[x]["total"], reverse=True)
     for spec in sorted_species:
-        rs_fh.write(f"{spec}\t{all_species[spec]}")
-        for samps in Species_dict_dict:
-            try:
-                rs_fh.write(f"\t{Species_dict_dict[samps][spec]}\t{Species_dict_dict[samps][spec]/Species_dict_dict[samps]['total']}")
-            except:
-                rs_fh.write(f"\t\t")
+        if int(all_species[spec]['total']) >= 100:
+            rs_fh.write(f"{spec}\t{all_species[spec]['match']}\t{all_species[spec]['total']}")
+            for samps in Species_dict_dict:
+                try:
+                    rs_fh.write(f"\t{Species_dict_dict[samps][spec]}\t{Species_dict_dict[samps][spec]/Species_dict_dict[samps]['total']}")
+                except:
+                    rs_fh.write(f"\t\t")
 
-        rs_fh.write("\n")
+            rs_fh.write("\n")
+        else:
+            break
+            
