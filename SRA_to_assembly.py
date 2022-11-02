@@ -3,18 +3,15 @@ import os
 import sys
 
 SRA_list = [
-    "SRR17853784",
-    "SRR18856318",
-    "SRR18856318",
-    "ERR8777800",
-    "ERR8777957",
-    "SRR20029327",
+    "SRR21907515",
+    "SRR21907526",
+    "SRR21907516",
 ]
 SRA_list = list(set(SRA_list))
 # fh_test = open('test.tsv', 'w')
 for subdir, dirs, files in os.walk(os.getcwd()):
     for file in files:
-        if file.endswith('_nt_calls.tsv.gz'): # file.endswith('.sam') or file.endswith('sam.gz') or
+        if '_nt_calls.tsv'  in file: # file.endswith('.sam') or file.endswith('sam.gz') or
             if  file.split('.')[0] in SRA_list and not 'Assemblies' in subdir:
                 print(os.path.join(subdir, file))
                 os.system(f"cp {os.path.join(subdir, file)} /mnt/g/MU_WW/SARS2/SRAs/Wastewater/Assemblies/{file}")

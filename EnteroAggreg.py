@@ -27,7 +27,7 @@ if SAMs:
                 except:
                     pass
                 else:
-                    # if (splitline[1] == "0" or splitline[1] == "16" or splitline[1] == "4") and len(splitline[9]) == 110:
+                    if len(splitline[9]) == 110: # (splitline[1] == "0" or splitline[1] == "16" or splitline[1] == "4") and 
                         species = splitline[9] # 'Unmatched'
                         counts = int(splitline[0].split('-')[-1])
                         total += counts
