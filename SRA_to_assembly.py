@@ -3,9 +3,11 @@ import os
 import sys
 
 SRA_list = [
-    "SRR21907515",
-    "SRR21907526",
-    "SRR21907516",
+        "ERR9812915",
+        "ERR9813259",
+        "ERR9813375",
+        "ERR9812936",
+        "ERR9813292",
 ]
 SRA_list = list(set(SRA_list))
 # fh_test = open('test.tsv', 'w')

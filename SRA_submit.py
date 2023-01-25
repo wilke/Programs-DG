@@ -302,7 +302,7 @@ for file in os.listdir(os.getcwd()):
             if 'RBD' in splitname[1]:
                 Date = splitname[1].upper().split('RBD')[0].strip('ALTPRENEW')
             elif 'NTD' in splitname[1]:
-                Date = splitname[1].upper().split('NTD')[0].strip("R")
+                Date = splitname[1].upper().split('NTD')[0].strip("R").split("M")[0].split("S1S2")[0]
             elif 'S1S2' in splitname[1]:
                 Date = splitname[1].upper().split('S1S2')[0].strip("R")
             elif splitname[1].endswith("M"):
@@ -349,7 +349,9 @@ for file in os.listdir(os.getcwd()):
                     # break
             Year = 2022
             if int(Month) > 11:
-                Year = 2021
+                Year = 2022
+            if int(Month) < 3:
+                Year = 2023
 
             full_date = f"{Year}-{Month}-{Day}"
             sample = f"{site}-{full_date}-{domain}"
@@ -368,7 +370,7 @@ for file in os.listdir(os.getcwd()):
             newbiosampacc = ''
             try:
                 newbiosampacc = biosamps_dict['Missouri-'+full_date]
-            except Exception as e:
+            except KeyError as e:
                 print(e)
                 print('biosamp')
                 print(file)

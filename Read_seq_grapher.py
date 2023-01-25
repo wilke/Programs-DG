@@ -7,52 +7,55 @@ import numpy as np
 from plotnine import *
 import re
 
+VOCs = {
+"Omicron BF.14"     :   "G1251T(K417N) T1320G(N440K) A1348G(N450D) T1355G(L452R) G1430A(S477N) C1433A(T478K) A1451C(E484A) T1456G(F486V) A1493G(Q498R) A1501T(N501Y) T1513C(Y505H)",
+"Omicron BQ.1.1"    :   "G1251T(K417N) T1320G(N440K) A1331C(K444T) T1355G(L452R) T1380A(N460K) G1430A(S477N) C1433A(T478K) A1451C(E484A) T1456G(F486V) A1493G(Q498R) A1501T(N501Y) T1513C(Y505H)",
+"Omicron BA.4/5"    :   "G1251T(K417N) T1320G(N440K) T1355G(L452R) G1430A(S477N) C1433A(T478K) A1451C(E484A) T1456G(F486V) A1493G(Q498R) A1501T(N501Y) T1513C(Y505H)",
+"Omicron BA.2.12.1" :   "G1251T(K417N) T1320G(N440K) T1355A(L452Q) G1430A(S477N) C1433A(T478K) A1451C(E484A) A1478G(Q493R) A1493G(Q498R) A1501T(N501Y) T1513C(Y505H)",
+"Omicron BA.2"      :   "G1251T(K417N) T1320G(N440K) G1430A(S477N) C1433A(T478K) A1451C(E484A) A1478G(Q493R) A1493G(Q498R) A1501T(N501Y) T1513C(Y505H)",
+"Omicron BA.1"      :   "G1251T(K417N) T1320G(N440K) G1336A(G446S) G1430A(S477N) C1433A(T478K) A1451C(E484A) A1478G(Q493R) G1486A(G496S) A1493G(Q498R) A1501T(N501Y) T1513C(Y505H) C1640A(T547K)",
+"Delta"     :  "T1355G(L452R) C1433A(T478K)",
+# "Mu/Theta"  :  "G1450A(E484K) A1501T(N501Y)",
+"Gamma"     :  "A1250C(K417T) G1450A(E484K) A1501T(N501Y)",
+"Beta"      :  "G1251T(K417N) G1450A(E484K) A1501T(N501Y)",
+"Alpha"     :  "A1501T(N501Y) C1709A(A570D)",
+}
+
+VOCs_by_hap = {y: x for x, y in VOCs.items()}
+
 omicron_mutations = [ ## Original From Rose
     'T19I',
     'LPPA24-27S---',
-    'L24S',
-    'P25--',
-    'P26-',
-    'A27-',
     'A67V',
     'IHV68-70I--',
-    'I68I',
-    'H69-',
-    'V70-',
     'T95I',
     'GVYY142-145D---',
     'G142D',
-    'V143-',
-    'Y144-',
-    'Y145-',
-    'G142D',
     'NL211-212I-',
-    'N211I',
-    'L212-',
-    'L212V',
     'V213G',
-    'V213R',
     '215EPE',
-    '215E',
-    '215P',
     'G339D',
     'S371L',
     'S373P',
     'S375F',
     'K417N',
     'N440K',
+    'N450D',
+    'L452Q',
+    'L452R',
     'G446S',
     'S477N',
     'T478K',
     'E484A',
+    'F486V',
     'Q493R',
     'G496S',
     'Q498R',
     'N501Y',
     'Y505H',
-    'T547K',
-    'H655Y'
+    'T547K'
 ]
+
 omicron_positions = [
     '19',
     '24',
@@ -78,18 +81,30 @@ omicron_positions = [
     '375',
     '417',
     '440',
+    '450',
+    '452',
     '446',
+    '452',
     '477',
     '478',
     '484',
+    '486',
     '493',
     '496',
     '498',
     '501',
     '505',
-    '547',
-    '655'
+    '547'
     ]
+
+for VOC in VOCs:
+    if "Omicron" in VOC:
+        for mut in VOCs[VOC].split(" "):
+            AAmut = mut.split("(")[-1].strip(")")
+            if not AAmut in omicron_mutations:
+                omicron_mutations.append(AAmut)
+            if not AAmut[1:-1] in omicron_positions:
+                omicron_positions.append(AAmut[1:-1])
 
 def mut_pos_stringer(muts):
     mut_pos_string = ''
@@ -143,7 +158,7 @@ def load_deconv(file_name): ## From Rose
     return df_raw # , df
 
 for file in os.listdir(os.getcwd()):
-    if file == 'S1s_reads.tsv': #.endswith('_trimmedv2.tsv'):
+    if file.endswith('.tsv'): #.endswith('_trimmedv2.tsv'):
 
         ####
         ####  Original plotting from Rose
@@ -308,4 +323,4 @@ for file in os.listdir(os.getcwd()):
          theme_classic()+
          theme(legend_position='right', figure_size=((pm_num+1)/6,(seq_num+1)/6), dpi=600, axis_text_x=element_text(angle=90, hjust=0.5), axis_text_y=element_text(color='black'), axis_line_y=element_line(color='white'), axis_ticks_major_y=element_line(color='white'),axis_ticks_minor_y=element_line(color='white'))) # , panel_grid=element_line(color='#111111', linetype='solid', size=0.1)
 
-        fig.save(filename = file[:-4]+'1.png')
+        fig.save(filename = file[:-4]+'1.svg')

@@ -24,7 +24,8 @@ WWTP_dict = {   2 : [1, "BB", "Queens"],
                 '045' : [45, 'Lower Meramec', 'Lower Meramec'],
                 'WI' : ['WI', 'WI', 'WI'],
                 'CA' : ['Cali', 'Cali', 'Cali'],
-                'VA' : ['VA', 'VA', 'VA']
+                'VA' : ['VA', 'VA', 'VA'],
+                'OK' : ['OK', 'OK', 'OK'],
 }
 WWTP_dict2 = {   "BB" : 2,
                 "HP" : 4,
@@ -47,8 +48,10 @@ file_names = []
 cp_lines = []
 for subdir, dirs, files in os.walk(os.getcwd()):
     for file in files:
-        if (file.lower().endswith('.sam') or file.lower().endswith('.sam.gz')) and ('RBD' in file or '2493' in file) and not ('RNA' in subdir.upper() or 'NTD' in file.upper() or 'S1S2' in file.upper() or 'unrep' in file.lower() or 'WWTP_P' in subdir.upper()):
+        if (file.lower().endswith('.sam') or file.lower().endswith('.sam.gz')) and ('RBD' in file or '2493' in file) and not 'WWTP_P' in subdir.upper():
 
+            if ('MIX' in subdir.upper() or 'NTD' in subdir.upper()) and not (file.endswith('RBD.sam') or file.endswith('RBD.sam.gz')):
+                continue
             wwtp = ''
             file_split = file.split('.')[0].split('_')
             if "NY" in file:
@@ -70,6 +73,8 @@ for subdir, dirs, files in os.walk(os.getcwd()):
                             wwtp = 'CA'
                         elif 'VA' in wwtp.upper():
                             wwtp = 'VA'
+                        elif 'OK' in wwtp.upper():
+                            wwtp = 'OK'
 
             if wwtp in WWTP_dict:
                 amp = 'RBD'
@@ -101,7 +106,13 @@ for subdir, dirs, files in os.walk(os.getcwd()):
                     amp += 'alt'
                 date = ''
                 try:
-                    if '-' in file_split[1]:
+                    if file.startswith("OK"):
+                        date = file.split("_")[0].strip("OK")
+                        try:
+                            int(date.split("-")[0])
+                        except:
+                            date = file.split("_")[1].split("ALT")[0]
+                    elif '-' in file_split[1]:
                         date = file_split[1]
                     elif '-' in file_split[2]:
                         date = file_split[2]
@@ -140,7 +151,7 @@ for subdir, dirs, files in os.walk(os.getcwd()):
                     day = int(day)
                     if month == 0:
                         month = 10
-                    if year == '2022' and month > 10:
+                    if year == '2022' and month > 10 and int(subdir.split('/')[7]) < 20220506:
                         year = '2021'
                     new_name = f"{WWTP_dict[wwtp][0]}_{year}-{month:02d}-{day:02d}_{amp}"
                     if new_name in file_names:
