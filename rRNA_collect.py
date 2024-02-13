@@ -40,22 +40,30 @@ if SAMs:
                         matchline = splitline[2].split('_')
                         if matchline[0] == "*":
                             species = 'Unmatched'
+                        elif int(splitline[4]) in (0, 1, 2, 3, 4, 255):
+                            species = 'Poor match'
                         elif 'de:f:' in line:
                             if float(splitline[19][5:]) > .02:
                                 species = 'Poor match'
                             else:
-                                if matchline[2] == "PREDICTED:":
-                                    species = matchline[3]+' '+matchline[4]
-                                elif matchline[1][0].isdigit():
-                                    species = matchline[2]+" "+matchline[3]
+                                if len(matchline) > 1:
+                                    if matchline[2] == "PREDICTED:":
+                                        species = matchline[3]+' '+matchline[4]
+                                    elif matchline[1][0].isdigit():
+                                        species = matchline[2]+" "+matchline[3]
+                                    else:
+                                        species = matchline[1]+' '+matchline[2]
                                 else:
-                                    species = matchline[1]+' '+matchline[2]
-                        elif matchline[2] == "PREDICTED:":
-                            species = matchline[3]+' '+matchline[4]
-                        elif matchline[1][0].isdigit():
-                            species = matchline[2]+" "+matchline[3]
+                                    species = matchline[0]
+                        elif len(matchline) > 1:
+                            if matchline[2] == "PREDICTED:":
+                                species = matchline[3]+' '+matchline[4]
+                            elif matchline[1][0].isdigit():
+                                species = matchline[2]+" "+matchline[3]
+                            else:
+                                species = matchline[1]+' '+matchline[2]
                         else:
-                            species = matchline[1]+' '+matchline[2]
+                            species = matchline[0]
                         all_species[species] = 1
                         try:
                             Species_dict_dict[samp_name][species] += counts

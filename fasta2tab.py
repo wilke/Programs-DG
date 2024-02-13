@@ -27,7 +27,7 @@ with open(name+".tsv","w") as out_fh:
         for line in args.file:
             if line.startswith('>'):
                 length = int(line.split("len=")[1].split(" ")[0])
-                if length > 1000:
+                if length > 1:
                     # out_fh.write("\n")
                     splitline = line.strip().split(" ")
                     ID = splitline[0].strip(">")
@@ -56,7 +56,7 @@ with open(name+".tsv","w") as out_fh:
                         # out_fh.write(segment.split("=")[1])
                         # out_fh.write("\t")
             else:
-                if length > 1000:
+                if length > 1:
                     dict_entries[ID]["seq"] += line.strip()
                     # out_fh.write(line.strip())
         

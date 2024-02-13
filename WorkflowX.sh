@@ -83,24 +83,24 @@ echo '===================================================================='
 	
 # done
 
-for file in *
-do
-	if [[ $file == *.merge.fq ]]
-		then
-		Sampid=$(echo $file | cut -d "." -f -1 )
-		echo $Sampid
-		#/mnt/g/MU_WW/vsearch/bin/vsearch --derep_fulllength $file --output $Sampid.derep1.fa --sizeout --minuniquesize 1 &>> derepinfo.txt 
-		# minimap2 -a /mnt/g/MU_WW/SARS2/SARS2.fasta $file -o $Sampid.SARS2.WG.sam --sam-hit-only --secondary no
-		minimap2 -a /mnt/g/MU_WW/SARS2/GP.fasta $file -o $Sampid.SARS2.S.test.sam --sam-hit-only --secondary no
-		# python /mnt/g/MU_WW/Programs/SAM2Fasta.py $Sampid.RBD.sam
-		# /mnt/g/MU_WW/vsearch/bin/vsearch --rereplicate $Sampid.RBD.fasta --output $Sampid.RBD.rerep.fa
-		# python /mnt/g/MU_WW/SAM_Refiner/SAM_Refiner.py -r /mnt/g/MU_WW/SARS2/SARS2.gb --wgs 1 --collect 0 --seq 1 --indel 0 --covar 0 --nt_call 1 --read 0 -S $Sampid.SARS2.WG.sam --min_count 1 --min_samp_abund 0 --min_col_abund 0 --ntabund 0 --ntcover 1 --AAreport 1 --chim_rm 0 --deconv 0
-		# python /mnt/g/MU_WW/SAM_Refiner/SAM_Refiner.py -r /mnt/g/MU_WW/SARS2/GP.fasta --wgs 1 --collect 0 --seq 1 --indel 0 --covar 0 --nt_call 1 --read 0 -S $Sampid.SARS2.S.sam --min_count 1 --min_samp_abund 0 --min_col_abund 0 --ntabund 0 --ntcover 1 --AAreport 1 --chim_rm 0 --deconv 0
-		# ragtag.py scaffold /mnt/g/MU_WW/SARS2/RBD.fa $Sampid.RBD.rerep.fa -o $Sampid -f 50
-		# megahit -r $file -o $Sampid.MH
-	fi
+# for file in *
+# do
+	# if [[ $file == *.merge.fq ]]
+		# then
+		# Sampid=$(echo $file | cut -d "." -f -1 )
+		# echo $Sampid
+		# #/mnt/g/MU_WW/vsearch/bin/vsearch --derep_fulllength $file --output $Sampid.derep1.fa --sizeout --minuniquesize 1 &>> derepinfo.txt 
+		# # minimap2 -a /mnt/g/MU_WW/SARS2/SARS2.fasta $file -o $Sampid.SARS2.WG.sam --sam-hit-only --secondary no
+		# minimap2 -a /mnt/g/MU_WW/SARS2/GP.fasta $file -o $Sampid.SARS2.S.test.sam --sam-hit-only --secondary no
+		# # python /mnt/g/MU_WW/Programs/SAM2Fasta.py $Sampid.RBD.sam
+		# # /mnt/g/MU_WW/vsearch/bin/vsearch --rereplicate $Sampid.RBD.fasta --output $Sampid.RBD.rerep.fa
+		# # python /mnt/g/MU_WW/SAM_Refiner/SAM_Refiner.py -r /mnt/g/MU_WW/SARS2/SARS2.gb --wgs 1 --collect 0 --seq 1 --indel 0 --covar 0 --nt_call 1 --read 0 -S $Sampid.SARS2.WG.sam --min_count 1 --min_samp_abund 0 --min_col_abund 0 --ntabund 0 --ntcover 1 --AAreport 1 --chim_rm 0 --deconv 0
+		# # python /mnt/g/MU_WW/SAM_Refiner/SAM_Refiner.py -r /mnt/g/MU_WW/SARS2/GP.fasta --wgs 1 --collect 0 --seq 1 --indel 0 --covar 0 --nt_call 1 --read 0 -S $Sampid.SARS2.S.sam --min_count 1 --min_samp_abund 0 --min_col_abund 0 --ntabund 0 --ntcover 1 --AAreport 1 --chim_rm 0 --deconv 0
+		# # ragtag.py scaffold /mnt/g/MU_WW/SARS2/RBD.fa $Sampid.RBD.rerep.fa -o $Sampid -f 50
+		# # megahit -r $file -o $Sampid.MH
+	# fi
 	
-done
+# done
 
 # python Contigpull.py
 

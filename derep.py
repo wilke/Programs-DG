@@ -31,17 +31,15 @@ args = parser.parse_args()
 seq_dict = {}
 total_reads = 0
 first_line = args.in_file.readline()
-args.in_file.seek(0)
 if first_line.startswith('>'):
     cur_seq = ""
     for line in args.in_file:
-        if line.startswith('>'):
-            if cur_seq:
-                try:
-                    seq_dict[cur_seq] += 1
-                except:
-                    seq_dict[cur_seq] = 1
-                cur_seq = ''
+        if line.startswith('>') and cur_seq:
+            try:
+                seq_dict[cur_seq] += 1
+            except:
+                seq_dict[cur_seq] = 1
+            cur_seq = ''
             total_reads += 1
         else:
             cur_seq += line.strip('\n\r')
@@ -53,6 +51,7 @@ if first_line.startswith('>'):
 
 elif first_line.startswith("@"):
 
+    args.in_file.seek(0)
     seq_id = ""
     sequence = ""
     seq_q_id = ""

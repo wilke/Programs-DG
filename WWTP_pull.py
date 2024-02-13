@@ -48,9 +48,15 @@ file_names = []
 cp_lines = []
 for subdir, dirs, files in os.walk(os.getcwd()):
     for file in files:
-        if (file.lower().endswith('.sam') or file.lower().endswith('.sam.gz')) and ('RBD' in file or '2493' in file) and not 'WWTP_P' in subdir.upper():
+        if (file.lower().endswith('.sam') or file.lower().endswith('.sam.gz')) and ('RBD' in file or '2493' in file) and not ('WWTP_P' in subdir.upper() or "P18" in subdir.upper()):
 
-            if ('MIX' in subdir.upper() or 'NTD' in subdir.upper()) and not (file.endswith('RBD.sam') or file.endswith('RBD.sam.gz')):
+            if "/NY" in subdir:
+                continue
+            if ('MIX' in subdir.upper() or 'NTD' in subdir.upper() ) and not (file.endswith('RBD.sam') or file.endswith('RBD.sam.gz')):
+                continue
+            if "_M.sam" in file:
+                continue
+            if "prerbd" in file.lower():
                 continue
             wwtp = ''
             file_split = file.split('.')[0].split('_')
@@ -67,7 +73,7 @@ for subdir, dirs, files in os.walk(os.getcwd()):
                         wwtp = WWTP_dict2[file.split("_")[0].strip("0d")[:-1]]
                     except:
                         wwtp = file.split("_")[0]
-                        if 'WI' in wwtp.upper():
+                        if 'WI' in wwtp.upper() or wwtp.upper().startswith("P18"):
                             wwtp = 'WI'
                         elif 'CA' in wwtp.upper():
                             wwtp = 'CA'
@@ -151,8 +157,8 @@ for subdir, dirs, files in os.walk(os.getcwd()):
                     day = int(day)
                     if month == 0:
                         month = 10
-                    if year == '2022' and month > 10 and int(subdir.split('/')[7]) < 20220506:
-                        year = '2021'
+                    if int(f"{year}{month}{day}") > int(subdir.split('/')[7].replace("-", "")):
+                        year = str(int(year)-1)
                     new_name = f"{WWTP_dict[wwtp][0]}_{year}-{month:02d}-{day:02d}_{amp}"
                     if new_name in file_names:
                         count = 2
@@ -180,5 +186,5 @@ for subdir, dirs, files in os.walk(os.getcwd()):
 
 test_fh.close()
 print(len(cp_lines))
-for line in cp_lines:
-    os.system(line)
+# for line in cp_lines:
+    # os.system(line)

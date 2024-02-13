@@ -3,22 +3,30 @@
 import os
 import sys
 import xml.parsers.expat
+import datetime
 
-os.system("curl -A 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:50.0) Gecko/20100101 Firefox/50.0' 'https://www.ncbi.nlm.nih.gov/sra/?term=sars-cov-2+wastewater' -o SRA_Search_Results.html")
+searchstr = '(sars-cov-2%20wastewater)%20AND%20(%222023%2F12%2F30%22%5BPublication%20Date%5D%20%3A%20%223000%22%5BPublication%20Date%5D)'
+# https://www.ncbi.nlm.nih.gov/sra?term=(sars-cov-2%20wastewater)%20AND%20(%222023%2F04%2F01%22%5BPublication%20Date%5D%20%3A%20%223000%22%5BPublication%20Date%5D)
+
+os.system(f"curl -A 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:50.0) Gecko/20100101 Firefox/50.0' 'https://www.ncbi.nlm.nih.gov/sra/?term={searchstr}' -o SRA_Search_Results.html")
 
 MCID = ""
 Key = ""
+
+ts = datetime.date.today().strftime("%y.%m.%d")
 
 with open("SRA_Search_Results.html", "r") as search_res:
     MCID = search_res.read().split('value="MCID_')[1].split('"')[0]
     search_res.seek(0)
     Key = search_res.read().split("query_key:&quot;")[1].split("&quot")[0]
-os.system(f"curl 'https://trace.ncbi.nlm.nih.gov/Traces/sra-db-be/sra-db-be.cgi?rettype=exp&WebEnv=MCID_{MCID}&query_key={Key}' -L -o SRAmetadata.xml")
-os.system(f"curl 'https://trace.ncbi.nlm.nih.gov/Traces/sra-db-be/sra-db-be.cgi?rettype=acclist&WebEnv=MCID_{MCID}&query_key={Key}' -L -o FullSRRList.txt")
+print(MCID)
+print(Key)
+os.system(f"curl 'https://trace.ncbi.nlm.nih.gov/Traces/sra-db-be/sra-db-be.cgi?rettype=exp&WebEnv=MCID_{MCID}&query_key={Key}' -L -o SRAmetadata.{ts}.xml")
+os.system(f"curl 'https://trace.ncbi.nlm.nih.gov/Traces/sra-db-be/sra-db-be.cgi?rettype=acclist&WebEnv=MCID_{MCID}&query_key={Key}' -L -o FullSRRList.{ts}.txt")
 
-with open("SRAmetadata.xml", "r") as xml_fh:
-    with open("SRA_meta.txt", "w") as txt_fh:
-        with open("SRA_meta.tsv", "w") as tsv_fh:
+with open(f"SRAmetadata.{ts}.xml", "r") as xml_fh:
+    with open(f"SRA_meta.{ts}.txt", "w") as txt_fh:
+        with open(f"SRA_meta.{ts}.tsv", "w") as tsv_fh:
 
             elements = []
             val_dict = {
@@ -28,6 +36,7 @@ with open("SRAmetadata.xml", "r") as xml_fh:
                 "Submitter" : "",
                 "Col_Date" : "",
                 "GeoLoc" : "",
+                "Population" : "",
             }
             flag_dict = {
                 "SRR_acc" : 0,
@@ -36,6 +45,7 @@ with open("SRAmetadata.xml", "r") as xml_fh:
                 "Submitter" : 0,
                 "Col_Date" : 0,
                 "GeoLoc" : 0,
+                "Population" : 0,
             }
 
             parse_xml = xml.parsers.expat.ParserCreate()
@@ -100,6 +110,11 @@ with open("SRAmetadata.xml", "r") as xml_fh:
                         flag_dict["GeoLoc"] = 0
                     if data in ("geo_loc_name", "geo loc name") or "geographic location" in data:
                         flag_dict["GeoLoc"] = 1
+                    if flag_dict["Population"] == 1:
+                        val_dict["Population"] = data
+                        flag_dict["Population"] = 0
+                    if data in ("ww_population", ): # or "geographic location" in data:
+                        flag_dict["Population"] = 1
 
             parse_xml.StartElementHandler = start_element
             parse_xml.EndElementHandler = end_element
@@ -108,3 +123,5 @@ with open("SRAmetadata.xml", "r") as xml_fh:
             parse_xml.Parse("\n".join(xml_data))
             
 
+os.system(f"cat SRA_meta.{ts}.tsv >> SRA_meta.tsv")
+os.system("python3 clean_meta.py")

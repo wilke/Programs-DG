@@ -2,8 +2,68 @@
 
 import os
 import sys
+import gzip
 
 samps = os.getcwd().split("/")[-1]
+
+
+nt_strings = ["TTGTCTGGTTTTAAG", "ATGGAGAACGCAGTG", "ATCGAGGGTACAG", "CCATTTTTGGACCAC"]
+
+meta_dict = {}
+
+hits=[]
+
+processed = []
+
+if os.path.isfile(".processed"):
+    with open(".processed", "r") as proced:
+        for line in proced:
+            processed.append(line.strip())
+
+
+# for file in os.listdir(os.getcwd()):
+    # if file.endswith("_hits.txt"):
+        # match = 0
+        # for string in nt_strings:
+            # if string in file.upper():
+                # match = 1
+        # if match == 1:
+            # with open(file, "r") as in_fh:
+                # for line in in_fh:
+                    # hits.append(line.strip())
+
+# with open("tmp_hits.txt", "w") as out_fh:
+    # for hit in hits:
+        # out_fh.write(f"{hit}\n")
+
+# print(len(hits))
+
+# with open("hits_meta.tsv", "r") as intact_fh:
+    # for line in intact_fh:
+        # if line.split("\t")[0]: # in incompletes:
+            # meta_dict[line.split("\t")[0]] = line
+
+with open("/mnt/g/MU_WW/SARS2/SRAs/Wastewater/SRA_meta.tsv", "r") as meta:
+    for line in meta:
+        split_line = line.split("\t")
+        if hits:
+            if split_line[0] in hits:
+                meta_dict[split_line[0]] = line
+        else:
+            # date = split_line[4].split("-")
+            # if date and ((date[0].isnumeric() and int(date[0]) < 2023) or not date[0].isnumeric()):
+                # # if ((len(date) > 1 and int(date[1]) > 5) or len(date) == 1 or int(date[0]) > 2022) or not date[0].isnumeric():
+                # meta_dict[split_line[0]] = line
+            # elif not date:
+            # if "verily" in line.lower():
+            meta_dict[split_line[0]] = line
+
+
+print(len(meta_dict))
+
+for hit in hits:
+    if not hit in meta_dict:
+        print(hit)
 
 NT_positions = []
 asdflas = [
@@ -259,13 +319,217 @@ asdflas = [
     '29332',
     '29510'
 ]
-NTcall_variants = [] # ['C241CandC3037TandC14408CandA23403G'] # [] # ['C24044T'] # ['C1059TandC3543TandC7635GandA18982GandA23013CandA23056CandC23117AandT23119CandA23403GandG23576TandC23604AandC26060T'] # ['C241TandC14408CandA17496CandA22893CandA23013CandA23056CandA23403GandA25020CandA27330CandA28271TandA4178CandA5648CandA6328GandA9204GandC1059TandC11916TandC1616AandC23029TandC23039AandC23054TandC23117AandC23277AandC24044TandC24418TandC25936GandC27920TandC28887TandC3037TandC3267TandC4113TandC4230TandC5178AandC9711TandG11670AandG17196AandG22340AandG22599AandG25019AandG25116AandG25563TandG25947CandG29540AandG3849TandG9479TandT18660CandT22907CandT23031AandT23406CandT25570AandT27322CandT27384CandT27907GandT27929AandT5507GandT8296CandT9982C'] 
-NT_multi_variants = [] # ['C241CandC3037TandC14408CandA23403GandG25563T']
-AA_variants = [] #["E484del"] # "Q498Y", "Q498H", ["A1250C(K417T) A1331C(K444T) T1334C(V445A) T1345C(Y449H) T1355G(L452R) T1380G(N460K) A1451C(E484A) TTT1456-1458CCT(F486P) T1480G(S494A) CAA1492-1494TAT(Q498Y) C1495T(P499S) A1498T(T500S) A1502C(N501T) T1513C(Y505H)"] #['CTACAAGTT14408-14416del'] # ['Reference'] # ['L452Q'] # ['GCTA13729-13732Del'] # ["K417"and"N440K"and"G446S"and"L452R"and"S477N"and"N460K"and"K444"and"Q493"and"E484"and"Q498"and"1450-1452Del"and"N501Y"and"Y505H"] # [] # ['L828F'] #    ['K444E'and'D574E'] #
-multi_var = ["T478KandnotS477N"] # ['N440EandL441RandK444delandK444SandK444TandV445delandV445AandV445NandG446delandG446DandY449HandY449RandY449SandL452KandY453FandL455WandF456LandN460KandT470NandT478RandV483AandV483delandE484delandE484PandF486AandF486PandF486VandF490HandF490PandF490YandQ493KandnotQ493RandQ493YandQ498HandQ498KandQ498YandQ498KandnotQ489RandP499HandP499SandN501SandN501TandY505NandY508HandH519NandT572IandT572N'] #  ["K417TandK444TandV445AandY449HandL452RandN460KandE484AandF486PandS494AandQ498YandP499SandT500SandN501TandY505H"] # ['K444TandY449RandN460KandE484AandF486PandQ493KandQ493RandQ498HandQ498YandN501SandN501TandY505H'] # ['440Eand441Rand444Sand445Nand446Dand449Hand449Rand449Sand452Qand452Kand453Fand455Wand456Land484Qand484Pand484Vand486Aand486Pand486Vand490Hand490Pand490Yand494Pand498Hand498Yand498Kand505Nand572I'] # ['K444TandV445AandY449andL452QandN460KandE484PandF486PandF490YandQ493KandQ498HandQ498YandN501SandN501T']
+NTcall_variants = []
+NT_multi_variants = [] # ["A29039TandG29049A"]
+AA_variants = [
+    "F490Y", "E484P",
+    "A372T",
+    "K458T", "482S","485D", "498F",
+    "417T",
+    "439K",
+    "440E",
+    "N440R",
+    "447C",
+    "456V",
+    "470N",
+    "472T",
+    "475V",
+    "477D",
+    "483I",
+    "486H",
+    "23008-23010DEL",
+    "N460S", "K1793Q", "G496S", "K440D","Y449N","Y453F","L455F","F456L","E484D","F486L","N501D", "Y449R", "Q498H", "Q498Y", "Y449Y", " F490Y", "Q493K", "N501S", "N501T", "E484V", "E484T", "E484Q", "Y449H", "K444DEL", "V445DEL", "G446DEL", "N447DEL", "Y448DEL", "V483DEL", "E484DEL", "Q498Y", "444DEL", "445DEL", "483DEL", "484DEL", "L828F",
+    "T478R", "N450D", "K444N", "F456L", "L455F", "A475V", "F486P", "S494P",
+    "Q498L",
+    "G496D",
+    "Q493T",
+    "Q493V",
+    "V446A",
+    "T22882A",
+    "T29758G",
+    "23151-23153DEL",
+    "28362G",
+    "28890-28903DEL",
+    "T500S",
+    "449DEL", 
+    "478N",
+    "496N",
+    ]
+multi_var = [
+    [2, [
+    "G413R",
+    "G413K",
+    "K417T",
+    "K417R",
+    "D420N",
+    "N439K",
+    "N440E",
+    "N440D",
+    "N440H",
+    "N440R",
+    "L441R",
+    "K444DEL",
+    "K444S",
+    "V445DEL",
+    "V445DEL",
+    "V445G",
+    "V445R",
+    "V445N",
+    "V446DEL",
+    "G446T",
+    "G446N",
+    "G446D",
+    "G446V",
+    "G447C",
+    "N447DEL",
+    "Y448DEL",
+    "Y449N",
+    "Y449H",
+    "Y449R",
+    "Y449S",
+    "Y453F",
+    "R454K",
+    "L455M",
+    "L455W",
+    "F456V",
+    "N460S",
+    "T470N",
+    "I472L",
+    "S477D",
+    "V483DEL",
+    "V483A",
+    "V483I",
+    "E484DEL",
+    "E484P",
+    "E484Q",
+    "E484V",
+    "E484D",
+    "E484T",
+    "F486H",
+    "F486A",
+    "F490H",
+    "F490Y",
+    "F490V",
+    "Q493K",
+    "G496V",
+    "Q498H",
+    "Q498Y",
+    "Q498K",
+    "P499S",
+    "P499T",
+    "P499H",
+    "T500S",
+    "N501S",
+    "N501T",
+    "445A",
+    "450k",
+    "478Q",
+    "493T",
+    "493V",
+    "498L",
+    "504D"
+    "Q498L",
+    "G496D",
+    "Q493T",
+    "Q493V",
+    "V446A",
+    ]],
+    [2, [
+    "G413R",
+    "G413K",
+    "K417T",
+    "K417R",
+    "D420N",
+    "N439K",
+    "N440E",
+    "N440D",
+    "N440H",
+    "N440R",
+    "L441R",
+    "K444DEL",
+    "K444S",
+    "V445DEL",
+    "V445DEL",
+    "V445G",
+    "V445R",
+    "V445N",
+    "V446DEL",
+    "G446T",
+    "G446N",
+    "G446D",
+    "G446V",
+    "G447C",
+    "N447DEL",
+    "Y448DEL",
+    "Y449N",
+    "Y449H",
+    "Y449R",
+    "Y449S",
+    "Y453F",
+    "R454K",
+    "L455M",
+    "L455W",
+    "F456V",
+    "N460S",
+    "T470N",
+    "I472L",
+    "S477D",
+    "V483DEL",
+    "V483A",
+    "V483I",
+    "E484DEL",
+    "E484P",
+    "E484Q",
+    "E484V",
+    "E484D",
+    "E484T",
+    "F486H",
+    "F486A",
+    "F490H",
+    "F490Y",
+    "F490V",
+    "Q493K",
+    "G496V",
+    "Q498H",
+    "Q498Y",
+    "Q498K",
+    "P499S",
+    "P499T",
+    "P499H",
+    "T500S",
+    "N501S",
+    "N501T",
+    "445A",
+    "450k",
+    "478Q",
+    "493T",
+    "493V",
+    "498L",
+    "504D",
+    "T478R", "N450D", "K444N", "F456L", "L455F", "A475V", "F486P", "S494P",
+    "Q498L",
+    "G496D",
+    "Q493T",
+    "Q493V",
+    "V446A",
+    ]],
+    [3, [
+    "C22916T", "T22917G", "T22926C"
+    ]],
+    [2, [
+    "K417T", "Q498H"
+    ]],
+    [3, [
+    "N439K", "Y449R", "L452Q"
+    ]],
+    [3, ["T23119A", "A23148G", "A23156G", ]],
+    ]
 Omis = {"1" : {'NTD' : ["A67V", "T95I", "425-433Del", "632-634Del", "215EPE"], 'RBD' : ["1251T(K417N)", "1320G(N440K)", "1336A(G446S)", "1430A(S477N)", "1433A(T478K)", "1451C(E484A)", "1478G(Q493R)", "1486A(G496S)", "1493G(Q498R)", "1501T(N501Y)", "1513C(Y505H)", "1640A(T547K)"]},
         "2" : {'NTD' : ["not A67V", "not T95I", "G142D", "not 425-433Del", "not 632-634Del", "V213G"], 'RBD' : ["1251T(K417N)", "1320G(N440K)", "not G446", "1430A(S477N)", "1433A(T478K)", "1451C(E484A)", "1478G(Q493R)", "not G496", "1493G(Q498R)", "1501T(N501Y)", "1513C(Y505H)", "not T547"]},
         "3" : {'NTD' : ["A67V", "T95I", "425-433Del", "632-634Del", "not 215EPE"], 'RBD' : ["1251T(K417N)", "1320G(N440K)", "1336A(G446S)", "1430A(S477N)", "1433A(T478K)", "1451C(E484A)", "1478G(Q493R)", "not G496", "1493G(Q498R)", "1501T(N501Y)", "1513C(Y505H)", "not T547"]}}
+
+AA_variants = list(set(AA_variants))
+
 Search_Omis = 0
 search_ref = 0
 Omi_matches = {}
@@ -281,39 +545,76 @@ Ref_Sample_dict = {}
 POS_Sample_dict = {}
 ref_NT_dict = {}
 
-if NTcall_variants:
-    i = 2
-    for variant in NTcall_variants:
-        NT_Sample_dict[variant] = {}
-        Ref_Sample_dict[variant] = {}
-        NT_outfiles[variant] = open(samps+"_NT_"+str(i)+".tsv","w")
-        i += 1
-if NT_multi_variants:
-    for variant in NT_multi_variants:
-        NT_mult_Sample_dict[variant] = {}
-        NT_mult_outfiles[variant] = open(samps+"_NTmult_"+variant+".tsv","w")
-    
-if AA_variants:
-    for variant in AA_variants:
-        AA_outfiles[variant] = open(samps+"_AA_"+variant+".tsv","w")
-if multi_var:
-    i = 1
-    for variant in multi_var:
-        multivar_fhs[variant] = open(samps+"_multi"+str(i)+".tsv","w")
-        multivar_fhs[variant].write(variant)
-        multivar_fhs[variant].write("\n")
-        i += 1
-if search_ref == 1:
-    ref_fh = open(samps+'_refs.tsv', 'w')
-files_read = []
+if processed:
+    if NTcall_variants:
+        i = 2
+        for variant in NTcall_variants:
+            NT_Sample_dict[variant] = {}
+            Ref_Sample_dict[variant] = {}
+            NT_outfiles[variant] = open(samps+"_NT_"+str(i)+".tsv","a")
+            i += 1
+    if NT_multi_variants:
+        for variant in NT_multi_variants:
+            NT_mult_Sample_dict[variant] = {}
+            NT_mult_outfiles[variant] = open(samps+"_NTmult_"+variant+".tsv","a")
 
+    if AA_variants:
+        AA_variants = list(set(AA_variants))
+        for variant in AA_variants:
+            AA_outfiles[variant] = open(samps+"_AA_"+variant+".tsv","a")
+    if multi_var:
+        i = 1
+        for variant in multi_var:
+            multivar_fhs["and".join(variant[1])] = open(samps+"_multi"+str(i)+".tsv","a")
+            i += 1
+    if search_ref == 1:
+        ref_fh = open(samps+'_refs.tsv', 'a')
+
+else:
+
+    if NTcall_variants:
+        i = 2
+        for variant in NTcall_variants:
+            NT_Sample_dict[variant] = {}
+            Ref_Sample_dict[variant] = {}
+            NT_outfiles[variant] = open(samps+"_NT_"+str(i)+".tsv","w")
+            i += 1
+    if NT_multi_variants:
+        for variant in NT_multi_variants:
+            NT_mult_Sample_dict[variant] = {}
+            NT_mult_outfiles[variant] = open(samps+"_NTmult_"+variant+".tsv","w")
+
+    if AA_variants:
+        AA_variants = list(set(AA_variants))
+        for variant in AA_variants:
+            AA_outfiles[variant] = open(samps+"_AA_"+variant+".tsv","w")
+    if multi_var:
+        i = 1
+        for variant in multi_var:
+            multivar_fhs["and".join(variant[1])] = open(samps+"_multi"+str(i)+".tsv","w")
+            multivar_fhs["and".join(variant[1])].write("and".join(variant[1]))
+            multivar_fhs["and".join(variant[1])].write("\n")
+            i += 1
+    if search_ref == 1:
+        ref_fh = open(samps+'_refs.tsv', 'w')
+
+files_read = []
+SRAs_read = []
 testcounter = 0
 for subdir, dirs, files in os.walk(os.getcwd()):
     for file in files:
-        if not file in files_read and not 'Assemblies' in subdir:
+        acc = file.split(".")[0]
+        if (not file in files_read) and ((not hits) or acc in hits) and ((not processed) or not os.path.join(subdir, file) in processed): # and file.split(".")[0] in meta_dict:  # and not 'Assemblies' in subdir:
             files_read.append(file)
-            if (file.endswith('_unique_seqs.tsv')) and (AA_variants or multi_var or NT_multi_variants) and not '_AA_' in file: # and not 'wgs' in file:  or file.endswith('_reads.tsv') or file.endswith('_covars.tsv') 
-                in_file = open(os.path.join(subdir, file), "r")
+            if (file.endswith('_unique_seqs.tsv') or file.endswith('_unique_seqs.tsv.gz')) and (AA_variants or multi_var or NT_multi_variants) and not '_AA_' in file: # and not 'wgs' in file:  or file.endswith('_reads.tsv') or file.endswith('_covars.tsv')
+                SRAs_read.append(acc)
+                print(f"{subdir}/{file}")
+                gz = 0
+                if file.endswith("gz"):
+                    in_file = gzip.open(os.path.join(subdir, file), "rb")
+                    gz = 1
+                else:
+                    in_file = open(os.path.join(subdir, file), "r")
                 NT_multi_matches = {}
                 AA_matches = {}
                 mv_matches = {}
@@ -322,94 +623,163 @@ for subdir, dirs, files in os.walk(os.getcwd()):
                 if file.endswith('_reads.tsv'):
                     ft = 1
 
-                for line in in_file:
-                    splitline = line.split("\t")
-                    try:
-                        splitline[1]
-                    except:
-                        pass
-                    else:
-                        if not splitline[1] == "Count":
-                            if NT_multi_variants:
-                                for variant in NT_multi_variants:
-                                    mismatch = 0
-                                    first = variant.split('and')[0][1:-1]
-                                    try:
-                                        if int(splitline[ft].split(' ')[0]) > int(first):
-                                            continue
-                                    except:
-                                        pass
-                                        
-                                    for PM in variant.split('and'):
-                                        if 'not' in PM:
-                                            curPM = PM.strip('not')
-                                            if curPM[0] == curPM[-1]:
+                try:
+                    for line in in_file:
+                        if gz == 1:
+                            line = line.decode()
+                        splitline = line.split("\t")
+                        try:
+                            splitline[1]
+                        except:
+                            pass
+                        else:
+                            if not splitline[1] == "Count":
+                                freq = 0
+                                if ft == 1:
+                                    count = int(splitline[0].split("-")[-1])
+                                else:
+                                    count = int(splitline[1])
+                                    freq = float(splitline[2])
+                                if count < 1:
+                                    break
+                                if NT_multi_variants:
+                                    for variant in NT_multi_variants:
+                                        mismatch = 0
+                                        first = variant.split('and')[0][1:-1]
+                                        try:
+                                            if int(splitline[ft].split(' ')[0]) > int(first):
+                                                continue
+                                        except:
+                                            pass
+
+                                        for PM in variant.split('and'):
+                                            if 'not' in PM:
+                                                curPM = PM.strip('not')
+                                                if curPM[0] == curPM[-1]:
+                                                    if PM[:-1] in splitline[ft]:
+                                                        # for nt in ['A', 'T', 'C', 'G', 'N', '-']:
+                                                            # if PM[:-1]+nt in splitline[0]:
+                                                        mismatch += 1
+                                                elif curPM in splitline[ft]:
+                                                    mismatch += 1
+                                            elif PM[0] == PM[-1]:
                                                 if PM[:-1] in splitline[ft]:
                                                     # for nt in ['A', 'T', 'C', 'G', 'N', '-']:
                                                         # if PM[:-1]+nt in splitline[0]:
                                                     mismatch += 1
-                                            elif curPM in splitline[ft]:
+                                            elif not PM in splitline[ft]:
                                                 mismatch += 1
-                                        elif PM[0] == PM[-1]:
-                                            if PM[:-1] in splitline[ft]:
-                                                # for nt in ['A', 'T', 'C', 'G', 'N', '-']:
-                                                    # if PM[:-1]+nt in splitline[0]:
-                                                mismatch += 1
-                                        elif not PM in splitline[ft]:
-                                            mismatch += 1
-                                    if mismatch == 0:
-                                        try:
-                                            NT_multi_matches[variant].append(line) # str(mismatch) + "\t" + line)
-                                            # counts += int(splitline[1])
-                                        except:
-                                            NT_multi_matches[variant] = [line]
-                            if ft == 1 or (int(splitline[1]) >= 4):
-                                if multi_var:
+                                        if mismatch == 0:
+                                            try:
+                                                NT_multi_matches[variant].append(line) # str(mismatch) + "\t" + line)
+                                                # counts += int(splitline[1])
+                                            except:
+                                                NT_multi_matches[variant] = [line]
+                                # if ft == 1 or (int(splitline[1]) >= 4):
+                                if multi_var and "surface" in line or "S_nt" in line: #
                                     for variant in multi_var:
                                         mismatch = 0
                                         match = 0
-                                        for PM in variant.split('and'):
+                                        for PM in variant[1]:
                                             if 'not' in PM:
                                                 if PM.strip('not') in splitline[ft]:
                                                     mismatch += 1
                                             else:
                                                 if PM in splitline[ft]:
                                                     match += 1
-                                                
-                                        if ((match - mismatch) > 0) and len(splitline[ft].split(" ")) < 25 and splitline[ft].count("insert") < 3 and splitline[ft].count("Del") < 4:
+
+                                        if ((match - mismatch) >= variant[0]) and splitline[ft].count("insert") < 5 and splitline[ft].count("Del") < 6:
                                             try:
-                                                mv_matches[variant].append(line)
+                                                mv_matches["and".join(variant[1])].append(line)
                                             except:
-                                                mv_matches[variant] = [line]
-                            if AA_variants:
-                                if (int(splitline[1]) > 0 or ft == 1):
-                                    for variant in AA_variants:
-                                        if variant in splitline[ft]:
-                                            try:
-                                                AA_matches[variant].append(line)
-                                            except:
-                                                AA_matches[variant] = [line]
+                                                mv_matches["and".join(variant[1])] = [line]
+                                if AA_variants: # and "surface" in line or "S_nt" in line: # and count > 9
+                                    if (int(splitline[1]) > 0 or ft == 1):
+                                        for variant in AA_variants:
+                                            if variant in line.upper():
+                                                try:
+                                                    AA_matches[variant].append(line)
+                                                except:
+                                                    AA_matches[variant] = [line]
+                except Exception as Err:
+                    print(f"file reading failed for {subdir} {file} {Err}")
 
                 if NT_multi_matches:
                     for variant in NT_multi_matches:
-                        NT_mult_outfiles[variant].write(file[:-4]+"\t")
-                        NT_mult_outfiles[variant].write("\n")
-                        for line in NT_multi_matches[variant]:
-                            NT_mult_outfiles[variant].write(line)
+                        if NT_multi_matches[variant]:
+                            count = 0
+                            for line in NT_multi_matches[variant]:
+                                if ft == 1:
+                                    count += int(line.split("\t")[0].split("-")[-1])
+                                else:
+                                    if int(line.split("\t")[1]) > 1:
+                                        count += int(line.split("\t")[1])
+                            if count > 0:
+                                NT_mult_outfiles[variant].write(subdir+"/"+file+"\n")
+                                try:
+                                    NT_mult_outfiles[variant].write(meta_dict[file.split(".")[0]])
+                                except:
+                                    NT_mult_outfiles[variant].write("metadata not present\n")
+                                count = 0
+                                for line in NT_multi_matches[variant]:
+                                    NT_mult_outfiles[variant].write(line)
+                                    count += 1
+                                    if count > 10:
+                                        break
                 if mv_matches:
                     for variant in mv_matches:
-                        multivar_fhs[variant].write(subdir+"/"+file[:-4]+"\t")
-                        multivar_fhs[variant].write("\n")
+                        count = 0
+                        passed_lines = []
                         for line in mv_matches[variant]:
-                            multivar_fhs[variant].write(line)
+                            read_count = 0
+                            if ft == 1:
+                                read_count += int(line.split("\t")[0].split("-")[-1])
+                            else:
+                                read_count += int(line.split("\t")[1])
+                            if read_count > 0:
+                                count += read_count
+                                passed_lines.append(line)
+                        if count > 0 and passed_lines:
+                            multivar_fhs[variant].write(subdir+"/"+file[:-4]+"\t")
+                            multivar_fhs[variant].write("\n")
+                            try:
+                                multivar_fhs[variant].write(meta_dict[file.split(".")[0]])
+                            except:
+                                multivar_fhs[variant].write("metadata not present\n")
+                            count = 0
+                            for line in passed_lines:
+                                multivar_fhs[variant].write(line)
+                                count += 1
+                                if count > 8:
+                                    break
                 if AA_matches:
                     for variant in AA_matches:
                         if AA_matches[variant]:
-                            AA_outfiles[variant].write(subdir+"/"+file+"\n")
+                            count = 0
                             for line in AA_matches[variant]:
-                                AA_outfiles[variant].write(line)
+                                line_count = 0
+                                if ft == 1:
+                                    line_count += int(line.split("\t")[0].split("-")[-1])
+                                else:
+                                    line_count += int(line.split("\t")[1])
+                                if line_count > 0:
+                                    count += line_count
+                            if count > 0:
+                                AA_outfiles[variant].write(subdir+"/"+file+"\n")
+                                try:
+                                    AA_outfiles[variant].write(meta_dict[file.split(".")[0]])
+                                except:
+                                    AA_outfiles[variant].write("metadata not present\n")
+                                count = 0
+                                for line in AA_matches[variant]:
+                                    AA_outfiles[variant].write(line)
+                                    count += 1
+                                    if count > 10:
+                                        break
 
                 in_file.close()
+                with open(".processed", "a") as proced:
+                    proced.write(f"{os.path.join(subdir, file)}\n")
 
             if file.endswith("_nt_calls.tsv") and (NTcall_variants or NT_positions):
                 in_file = open(os.path.join(subdir, file), "r")
@@ -437,8 +807,8 @@ for subdir, dirs, files in os.walk(os.getcwd()):
                                     ref_NT_dict[splitline[0]]
                                 except:
                                     ref_NT_dict[splitline[0]] = splitline[1]
-                                    
-                                
+
+
                         if NTcall_variants:
                             for var in NTcall_variants:
                                 try:
@@ -488,6 +858,9 @@ for subdir, dirs, files in os.walk(os.getcwd()):
 
 
                 in_file.close()
+
+                with open(".processed", "a") as proced:
+                    proced.write(f"{file}\n")
 
             if file.endswith("_chim_rm.tsv") or file.endswith("_covar_deconv.tsv"):
                 if Search_Omis == 1 or search_ref == 1:
@@ -562,8 +935,15 @@ for subdir, dirs, files in os.walk(os.getcwd()):
 
                     in_file.close()
 
+                with open(".processed", "a") as proced:
+                    proced.write(f"{file}\n")
+
 if search_ref == 1:
     ref_fh.close()
+
+
+if os.path.isfile(".processed"):
+    os.remove(".processed")
 
 if multi_var:
     for variant in multivar_fhs:
@@ -597,8 +977,8 @@ if POS_Sample_dict:
             except:
                 fh_POS_table.write(f"\t")
         fh_POS_table.write(f"\n")
-                
-        
+
+
     fh_POS_table.close()
 
 if NT_Sample_dict:
@@ -618,10 +998,10 @@ if NT_Sample_dict:
                 except:
                     fh_NT_table.write(f"\t")
             fh_NT_table.write(f"\n")
-                    
-            
+
+
         fh_NT_table.close()
-        
+
 if Ref_Sample_dict:
     i = 2
     for variant in Ref_Sample_dict:
@@ -639,10 +1019,10 @@ if Ref_Sample_dict:
                 except:
                     fh_Ref_table.write(f"\t")
             fh_Ref_table.write(f"\n")
-                    
-            
+
+
         fh_Ref_table.close()
-    
+
 
 if Omi_matches:
     Omi_out_fh = open(samps+"_Omis.tsv","w")
@@ -662,3 +1042,7 @@ if Omi_matches:
             Omi_out_fh.write("\n")
         Omi_out_fh.write("\n")
     Omi_out_fh.close()
+
+for sra in hits:
+    if not sra in SRAs_read:
+        print(f"{sra} not found")

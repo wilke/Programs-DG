@@ -2,6 +2,12 @@
 
 import os
 import sys
+import datetime
+
+cur_date = datetime.date.today() # .strftime('%Y%m%d')
+
+cur_year = datetime.datetime.now().year
+
 
 ss_pop_dict = {
                 "1":"12000",
@@ -256,6 +262,20 @@ for file in os.listdir(os.getcwd()):
 
         fh_biosamps_in.close()
 
+amps = (
+"RBD",
+"M_",
+"NTD",
+"N_",
+"NMULTI",
+"S1S2",
+"2493",
+"828",
+"PRERBD",
+"NSP5",
+"NSP9",
+
+)
 sampnames = []
 out_file = open("SRA_sub_list.tsv", "w")
 out_file.write("library_ID\ttitle\tlibrary_strategy\tlibrary_source\tlibrary_selection\tlibrary_layout\tplatform\tinstrument_model\tdesign_description\tfiletype\tfilename\tfilename2\tbiosample_accession")
@@ -266,34 +286,57 @@ for file in os.listdir(os.getcwd()):
         splitname = file.split('_')
 
         domain = ''
-        if 'RBD' in file.upper():
-            if 'NTD' in file.upper() or 'S1S2' in file.upper() or 'RBD_M_' in file.upper():
-                domain = 'Mixed'
-            elif 'ALT' in file.upper():
-                domain = 'ALTRBD'
-            elif 'PRERBD' in file.upper():
-                domain = 'PreRBD'
-            else:
-                domain = 'RBD'
-        elif 'MIX' in file.upper():
-            domain = 'Mixed'
-        elif 'NTD' in file.upper():
-            if 'S1S2' in file.upper():
-                domain = 'Mixed'
-            else:
-                domain = 'NTD'
-        elif 'S1S2' in file.upper():
-            domain = 'S1S2'
-        elif "2493" in file:
-            domain = "RBD"
-        elif "M" in splitname[1]:
-            domain = "M"
-        elif splitname[1].endswith("828"):
-            domain = "828"
+        domains = []
+        for amp in amps:
+            if amp in file.upper():
+                domains.append(amp)
+        if len(domains) > 1 and not (len(domains) == 2 and "PRERBD" in domains):
+            domain = "Mixed"
         else:
-            print(f"no domain found for {file}")
-
-        if 'RBD' in splitname[0]:
+            try:
+                domain = domains[0]
+            except:
+                print("domain fail")
+                print(domains)
+                print(file)
+                exit(1)
+        # if 'RBD' in file.upper():
+            # if 'NTD' in file.upper() or 'S1S2' in file.upper() or 'RBD_M_' in file.upper():
+                # domain = 'Mixed'
+            # elif 'ALT' in file.upper():
+                # domain = 'ALTRBD'
+            # elif 'PRERBD' in file.upper():
+                # domain = 'PreRBD'
+            # else:
+                # domain = 'RBD'
+        # elif 'MIX' in file.upper():
+            # domain = 'Mixed'
+        # elif 'NTD' in file.upper():
+            # if 'S1S2' in file.upper():
+                # domain = 'Mixed'
+            # else:
+                # domain = 'NTD'
+        # elif 'S1S2' in file.upper():
+            # domain = 'S1S2'
+        # elif "2493" in file:
+            # domain = "RBD"
+        # elif "M" in splitname[1]:
+            # domain = "M"
+        # elif splitname[1].endswith("828"):
+            # domain = "828"
+        # else:
+            # print(f"no domain found for {file}")
+        
+        
+        Date = ""
+        for c in splitname[1]:
+            if c.isnumeric() or c == "-":
+                Date += c
+            else:
+                break
+        if Date and "-" in Date:
+            site = splitname[0]
+        elif 'RBD' in splitname[0]:
             site = splitname[0].split('RBD')[0].upper().strip('ABCDOC-')
             Date = splitname[0].split('RBD')[1].strip('NTD')
         else:
@@ -347,11 +390,13 @@ for file in os.listdir(os.getcwd()):
                     # Day += c
                 # else:
                     # break
-            Year = 2022
-            if int(Month) > 11:
-                Year = 2022
-            if int(Month) < 3:
-                Year = 2023
+
+        
+            Year = cur_year
+            
+            if cur_date < datetime.date(cur_year, int(Month), int(Day)):
+                Year = int(cur_year) - 1
+
 
             full_date = f"{Year}-{Month}-{Day}"
             sample = f"{site}-{full_date}-{domain}"
@@ -389,8 +434,11 @@ for file in os.listdir(os.getcwd()):
                 "S1S2" : "Spike S1-S2 Junction Domain amplicon",
                 "Mixed" : "Mixed Domain amplicons",
                 "828" : "Amino acid 828 domain amplicon",
-                "M" : "M amplicon",
+                "M_" : "M amplicon",
                 "PreRBD" : "PreRBD Domain amplicon",
+                "N_" : "N amplicon",
+                "NSP5" : "NSP5 amplicon",
+                "NSP9" : "NSP9 amplicon",
                 }
             
             out_file.write(domain_out_dict[domain])
