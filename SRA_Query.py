@@ -5,8 +5,16 @@ import sys
 import xml.parsers.expat
 import datetime
 
-searchstr = '(sars-cov-2%20wastewater)%20AND%20(%222023%2F12%2F30%22%5BPublication%20Date%5D%20%3A%20%223000%22%5BPublication%20Date%5D)'
-# https://www.ncbi.nlm.nih.gov/sra?term=(sars-cov-2%20wastewater)%20AND%20(%222023%2F04%2F01%22%5BPublication%20Date%5D%20%3A%20%223000%22%5BPublication%20Date%5D)
+s_y = '2024'
+s_m = '02'
+s_d = '01'
+e_y = '2050'
+e_m = '12'
+e_d = '01'
+
+searchstr = f'(sars-cov-2%20wastewater)%20AND%20(%22{s_y}%2F{s_m}%2F{s_d}%22%5BPublication%20Date%5D%20%3A%20%22{e_y}%2F{e_m}%2F{e_d}%22%5BPublication%20Date%5D)'
+
+# searchstr = '(sars-cov-2%20wastewater)%20AND%20(%222023%2F10%2F30%22%5BPublication%20Date%5D%20%3A%20%223000%22%5BPublication%20Date%5D)'
 
 os.system(f"curl -A 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:50.0) Gecko/20100101 Firefox/50.0' 'https://www.ncbi.nlm.nih.gov/sra/?term={searchstr}' -o SRA_Search_Results.html")
 
