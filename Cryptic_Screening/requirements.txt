@@ -1,0 +1,2 @@
+pysam
+git+https://github.com/degregory/SAM_Refiner.git
