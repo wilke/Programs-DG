@@ -1,0 +1,40 @@
+# Example configuration file for cryptic-screen
+# 
+# This file demonstrates all available configuration options.
+# Command line arguments always override these settings.
+#
+# To use this file:
+#   cryptic-screen --config config/cryptic-screen.yaml COMMAND [OPTIONS]
+
+# Global settings applied to all commands
+global:
+  data_dir: ./data            # Directory containing reference files
+  output_dir: ./results       # Default output directory
+  workers: 8                  # Number of parallel workers
+  log_level: INFO            # Logging level: DEBUG, INFO, WARNING, ERROR
+
+# Command-specific settings
+nt:
+  # NT screening specific options
+  file_pattern: "*.{sam,bam,cram}"
+  recursive: true
+  # append_sequences: ./data/custom_nt_sequences.txt
+
+pm:
+  # PM screening specific options
+  single_pm: SinglePMs.txt    # Relative to data_dir
+  linked_pm: LinkedPMs.txt    # Relative to data_dir
+  total_cutoff: 10
+  per_file_cutoff: 1
+  file_pattern: "*_unique_seqs.tsv{,.gz}"
+
+winnow:
+  # Winnow filtering options
+  nt_cutoff: 10
+  pm_cutoff: 10
+  # metadata: ./data/metadata/sra_meta.tsv
+
+derep:
+  # Deduplication options
+  min_count: 2
+  # memory_limit: 16  # GB

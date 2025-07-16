@@ -8,7 +8,13 @@ import logging
 from pathlib import Path
 import shutil
 import tempfile
+import glob
 from ..utils import resolve_file_path
+from ..progress import ProgressIndicator, FileScanner
+from ..validation import (
+    validate_input_directory, validate_output_file, 
+    validate_reference_file, ValidationError
+)
 
 def run(args):
     """Run NT screening with CLI arguments"""
@@ -45,20 +51,54 @@ def run(args):
             sys.exit(1)
     
     # Validate input directory
-    input_dir = Path(args.input)
-    if not input_dir.exists():
-        logger.error(f"Input directory not found: {args.input}")
+    try:
+        input_dir = validate_input_directory(
+            args.input, 
+            file_types=['.sam', '.sam.gz', '.cram', '.bam'],
+            recursive=args.recursive
+        )
+    except ValidationError as e:
+        logger.error(str(e))
+        logger.info("Please check that:")
+        logger.info("  1. The input directory exists and is readable")
+        logger.info("  2. The directory contains SAM/BAM/CRAM files")
+        logger.info("  3. You have permission to read the files")
         sys.exit(1)
+    
+    # Scan for input files
+    scanner = FileScanner(quiet=args.quiet)
+    file_extensions = ['.sam', '.sam.gz', '.cram', '.bam']
+    
+    logger.info(f"Scanning for SAM/BAM/CRAM files in {input_dir}...")
+    input_files = []
+    for ext in file_extensions:
+        pattern = f"*{ext}"
+        if args.recursive:
+            found = list(input_dir.rglob(pattern))
+        else:
+            found = list(input_dir.glob(pattern))
+        input_files.extend([f for f in found if f.is_file()])
+    
+    if not input_files:
+        logger.error(f"No SAM/BAM/CRAM files found in {input_dir}")
+        sys.exit(1)
+    
+    logger.info(f"Found {len(input_files)} files to process")
     
     if args.dry_run:
         logger.info("DRY RUN - Would process:")
-        logger.info(f"  Input: {input_dir}")
+        logger.info(f"  Input: {input_dir} ({len(input_files)} files)")
         logger.info(f"  Output: {output_file}")
         logger.info(f"  Workers: {args.workers}")
         if custom_sequences:
             logger.info(f"  Custom sequences: {custom_sequences}")
         if append_sequences:
             logger.info(f"  Append sequences: {append_sequences}")
+        logger.info("\nFiles that would be processed:")
+        for i, f in enumerate(input_files[:10], 1):
+            logger.info(f"  {i}. {f.name}")
+        if len(input_files) > 10:
+            logger.info(f"  ... and {len(input_files) - 10} more files")
         return
     
     # Add the Cryptic_Screening directory to path for imports

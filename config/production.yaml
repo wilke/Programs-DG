@@ -1,0 +1,32 @@
+# Production configuration for cryptic-screen
+# 
+# This configuration is optimized for production workloads
+# with higher worker counts and specific paths.
+
+global:
+  data_dir: /data/references/cryptic-screening
+  output_dir: /data/results/cryptic-screening
+  workers: 32
+  log_level: INFO
+  log_file: /var/log/cryptic-screening/screening.log
+
+nt:
+  file_pattern: "*.{sam,bam,cram}"
+  recursive: true
+  resume: true  # Always try to resume from existing results
+
+pm:
+  single_pm: SinglePMs_v2.txt
+  linked_pm: LinkedPMs_v2.txt
+  total_cutoff: 5
+  per_file_cutoff: 1
+  file_pattern: "*_unique_seqs.tsv{,.gz}"
+
+winnow:
+  metadata: /data/metadata/sra_meta_latest.tsv
+  nt_cutoff: 20
+  pm_cutoff: 15
+
+derep:
+  min_count: 3
+  memory_limit: 64  # GB

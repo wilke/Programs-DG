@@ -162,13 +162,41 @@ def load_config(config_file):
     try:
         import yaml
         with open(config_file, 'r') as f:
-            return yaml.safe_load(f)
+            config = yaml.safe_load(f) or {}
+            logging.info(f"Loaded configuration from {config_file}")
+            return config
     except ImportError:
-        logging.warning("PyYAML not installed, config file ignored")
+        logging.warning("PyYAML not installed. Install with: pip install pyyaml")
+        logging.warning("Config file ignored. Proceeding with command line arguments only.")
         return {}
+    except FileNotFoundError:
+        logging.error(f"Configuration file not found: {config_file}")
+        sys.exit(1)
+    except yaml.YAMLError as e:
+        logging.error(f"Error parsing YAML configuration file: {e}")
+        sys.exit(1)
     except Exception as e:
-        logging.error(f"Error loading config file: {e}")
-        return {}
+        logging.error(f"Unexpected error loading config file: {e}")
+        sys.exit(1)
+
+def apply_config_to_args(args, config):
+    """Apply configuration values to arguments, with command line taking precedence"""
+    if not config:
+        return
+    
+    # Apply global config first
+    global_config = config.get('global', {})
+    for key, value in global_config.items():
+        if hasattr(args, key) and getattr(args, key) is None:
+            setattr(args, key, value)
+            logging.debug(f"Applied global config: {key}={value}")
+    
+    # Apply command-specific config
+    if args.command and args.command in config:
+        for key, value in config.get(args.command, {}).items():
+            if hasattr(args, key) and getattr(args, key) is None:
+                setattr(args, key, value)
+                logging.debug(f"Applied {args.command} config: {key}={value}")
 
 def main():
     parser = create_parser()
@@ -178,20 +206,26 @@ def main():
         parser.print_help()
         sys.exit(1)
     
-    # Setup logging
+    # Setup logging first (so config loading can be logged)
     setup_logging(args)
+    
+    # Log startup information
+    logger = logging.getLogger(__name__)
+    logger.info(f"Cryptic Screening Tools v1.0.0")
+    logger.info(f"Command: {args.command}")
     
     # Load config file if provided
     config = load_config(args.config)
     
     # Apply config values (command line args override config)
-    for key, value in config.get(args.command, {}).items():
-        if hasattr(args, key) and getattr(args, key) is None:
-            setattr(args, key, value)
+    apply_config_to_args(args, config)
     
-    # Log configuration
-    logging.info(f"Running command: {args.command}")
-    logging.debug(f"Arguments: {args}")
+    # Log final configuration
+    if logger.isEnabledFor(logging.DEBUG):
+        logger.debug("Final configuration:")
+        for key, value in vars(args).items():
+            if value is not None:
+                logger.debug(f"  {key}: {value}")
     
     # Import and run the appropriate command
     try:
@@ -207,10 +241,16 @@ def main():
         elif args.command == 'derep':
             from .commands import derep
             derep.run(args)
+        
+        logger.info(f"Command '{args.command}' completed successfully")
+        
+    except KeyboardInterrupt:
+        logger.warning("Operation cancelled by user")
+        sys.exit(130)
     except Exception as e:
-        logging.error(f"Error running {args.command}: {e}")
+        logger.error(f"Error running {args.command}: {e}")
         if args.log_level == 'DEBUG':
-            raise
+            logger.exception("Full traceback:")
         sys.exit(1)
 
 if __name__ == '__main__':
