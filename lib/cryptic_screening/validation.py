@@ -160,7 +160,15 @@ def validate_positive_integer(value: Union[int, str],
         ValidationError: If validation fails
     """
     try:
-        int_value = int(value)
+        # Handle float strings like "5.0"
+        if isinstance(value, str) and '.' in value:
+            float_value = float(value)
+            if float_value.is_integer():
+                int_value = int(float_value)
+            else:
+                raise ValidationError(f"{name} must be an integer, got: {value}")
+        else:
+            int_value = int(value)
     except (ValueError, TypeError):
         raise ValidationError(f"{name} must be an integer, got: {value}")
     

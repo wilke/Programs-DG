@@ -4,7 +4,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="cryptic-screening",
-    version="1.0.0",
+    version="1.2.0",
     description="Files used to screen SRA samples for cryptic signals",
     author="Cryptic Screening Team",
     python_requires=">=3.6",

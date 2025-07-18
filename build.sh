@@ -6,7 +6,7 @@ set -e
 # Get build metadata
 BUILD_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 VCS_REF=$(git rev-parse --short HEAD 2>/dev/null || echo "unknown")
-VERSION=${VERSION:-1.1.0}
+VERSION=${VERSION:-1.2.0}
 
 echo "Building Bioinformatics Programs Suite Docker images..."
 echo "Build Date: $BUILD_DATE"

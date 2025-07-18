@@ -23,10 +23,10 @@ class ProgressIndicator:
         
     def update(self, n: int = 1) -> None:
         """Update progress by n items"""
+        self.current += n
+        
         if self.quiet:
             return
-            
-        self.current += n
         current_time = time.time()
         
         # Update at most once per second
